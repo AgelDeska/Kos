@@ -28,6 +28,12 @@ class KamarModel extends Model
         'status'      => 'required|in_list[Tersedia,Di Booking,Terisi,Perbaikan]',
     ];
 
+    // Metode untuk mendapatkan validation rules dengan signature yang sesuai parent class
+    public function getValidationRules(array $options = []): array
+    {
+        return $this->validationRules;
+    }
+
     /**
      * Metode kustom untuk mendapatkan daftar kamar yang tersedia atau dibooking
      * @param string $status

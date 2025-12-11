@@ -21,11 +21,60 @@ class Pembayaran extends BaseController
         $this->userModel = new UserModel();
     }
 
-    // [C R U D] - R (Read/Index): Daftar semua pembayaran
+    // [C R U D] - R (Read/Index): Daftar semua pembayaran dengan filter dan search
     public function index()
     {
-        // Ambil detail pembayaran dengan JOIN dari Model
-        $data['pembayarans'] = $this->pembayaranModel->getPembayaranDetail(); 
+        $search = $this->request->getGet('search') ?? '';
+        $status = $this->request->getGet('status') ?? '';
+        $sortBy = $this->request->getGet('sortBy') ?? 'tanggal_bayar';
+        $sortOrder = $this->request->getGet('sortOrder') ?? 'DESC';
+
+        // Ambil pembayaran dengan JOIN
+        $pembayarans = $this->pembayaranModel->getPembayaranDetail();
+
+        // Filter berdasarkan search (username, nomor kamar)
+        if (!empty($search)) {
+            $pembayarans = array_filter($pembayarans, function($p) use ($search) {
+                $searchLower = strtolower($search);
+                return (stripos($p['username'], $searchLower) !== false ||
+                        stripos($p['nomor_kamar'], $searchLower) !== false ||
+                        stripos($p['jenis_pembayaran'], $searchLower) !== false);
+            });
+        }
+
+        // Filter berdasarkan status
+        if (!empty($status)) {
+            $pembayarans = array_filter($pembayarans, function($p) use ($status) {
+                return $p['status'] === $status;
+            });
+        }
+
+        // Sort
+        if (!empty($pembayarans)) {
+            usort($pembayarans, function($a, $b) use ($sortBy, $sortOrder) {
+                $valueA = $a[$sortBy] ?? '';
+                $valueB = $b[$sortBy] ?? '';
+
+                if (in_array($sortBy, ['tanggal_bayar'])) {
+                    $valueA = strtotime($valueA);
+                    $valueB = strtotime($valueB);
+                } elseif ($sortBy === 'jumlah') {
+                    $valueA = (int)$valueA;
+                    $valueB = (int)$valueB;
+                }
+
+                if ($valueA == $valueB) return 0;
+                $result = ($valueA < $valueB) ? -1 : 1;
+                return ($sortOrder === 'DESC') ? -$result : $result;
+            });
+        }
+
+        $data['pembayarans'] = $pembayarans;
+        $data['search'] = $search;
+        $data['status'] = $status;
+        $data['sortBy'] = $sortBy;
+        $data['sortOrder'] = $sortOrder;
+
         return view('admin/pembayaran/index', $data);
     }
 

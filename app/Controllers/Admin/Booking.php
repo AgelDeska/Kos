@@ -15,10 +15,59 @@ class Booking extends BaseController
         $this->kamarModel = new KamarModel();
     }
 
-    // Daftar semua booking
+    // Daftar semua booking dengan filter dan search
     public function index()
     {
-        $data['bookings'] = $this->bookingModel->getBookingDetail(); // Ambil detail dengan join
+        $search = $this->request->getGet('search') ?? '';
+        $status = $this->request->getGet('status') ?? '';
+        $sortBy = $this->request->getGet('sortBy') ?? 'tanggal_booking';
+        $sortOrder = $this->request->getGet('sortOrder') ?? 'DESC';
+
+        // Ambil booking dengan JOIN
+        $bookings = $this->bookingModel->getBookingDetail();
+
+        // Filter berdasarkan search (username, nomor kamar)
+        if (!empty($search)) {
+            $bookings = array_filter($bookings, function($b) use ($search) {
+                $searchLower = strtolower($search);
+                return (stripos($b['username'], $searchLower) !== false ||
+                        stripos($b['nomor_kamar'], $searchLower) !== false);
+            });
+        }
+
+        // Filter berdasarkan status
+        if (!empty($status)) {
+            $bookings = array_filter($bookings, function($b) use ($status) {
+                return $b['status'] === $status;
+            });
+        }
+
+        // Sort
+        if (!empty($bookings)) {
+            usort($bookings, function($a, $b) use ($sortBy, $sortOrder) {
+                $valueA = $a[$sortBy] ?? '';
+                $valueB = $b[$sortBy] ?? '';
+
+                if (in_array($sortBy, ['tanggal_booking', 'tanggal_mulai_sewa'])) {
+                    $valueA = strtotime($valueA);
+                    $valueB = strtotime($valueB);
+                } elseif (in_array($sortBy, ['durasi_sewa_bulan'])) {
+                    $valueA = (int)$valueA;
+                    $valueB = (int)$valueB;
+                }
+
+                if ($valueA == $valueB) return 0;
+                $result = ($valueA < $valueB) ? -1 : 1;
+                return ($sortOrder === 'DESC') ? -$result : $result;
+            });
+        }
+
+        $data['bookings'] = $bookings;
+        $data['search'] = $search;
+        $data['status'] = $status;
+        $data['sortBy'] = $sortBy;
+        $data['sortOrder'] = $sortOrder;
+
         return view('admin/booking/index', $data);
     }
 

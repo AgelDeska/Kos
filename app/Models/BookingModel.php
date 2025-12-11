@@ -37,7 +37,7 @@ class BookingModel extends Model
     public function getBookingDetail($id = null)
     {
         $builder = $this->db->table($this->table);
-        $builder->select('booking.*, user.nama as nama_penyewa, kamar.nomor_kamar, kamar.harga');
+        $builder->select('booking.*, user.username, user.nama as nama_penyewa, kamar.nomor_kamar, kamar.harga');
         $builder->join('user', 'user.user_id = booking.user_id');
         $builder->join('kamar', 'kamar.kamar_id = booking.kamar_id');
 
@@ -45,6 +45,6 @@ class BookingModel extends Model
             return $builder->where('booking.booking_id', $id)->first();
         }
 
-        return $builder->findAll();
+        return $builder->get()->getResultArray();
     }
 }

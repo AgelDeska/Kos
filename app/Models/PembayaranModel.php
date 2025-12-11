@@ -37,7 +37,7 @@ class PembayaranModel extends Model
     public function getPembayaranDetail($id = null)
     {
         $builder = $this->db->table($this->table);
-        $builder->select('pembayaran.*, user.nama as nama_penyewa, kamar.nomor_kamar');
+        $builder->select('pembayaran.*, user.nama as nama_penyewa, user.username, kamar.nomor_kamar');
         $builder->join('user', 'user.user_id = pembayaran.user_id');
         $builder->join('kamar', 'kamar.kamar_id = pembayaran.kamar_id', 'left'); // Menggunakan LEFT join karena kamar_id bisa null
 
@@ -45,6 +45,6 @@ class PembayaranModel extends Model
             return $builder->where('pembayaran.pembayaran_id', $id)->first();
         }
 
-        return $builder->findAll();
+        return $builder->get()->getResultArray();
     }
 }

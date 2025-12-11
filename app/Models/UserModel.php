@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table            = 'users';
-    protected $primaryKey       = 'id';
+    protected $table            = 'user';
+    protected $primaryKey       = 'user_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['role_id', 'nama', 'username', 'email', 'no_hp', 'password', 'is_active', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['username', 'password', 'role', 'nama', 'email', 'no_telp', 'is_active', 'tanggal_masuk', 'created_at', 'updated_at', 'reset_token', 'reset_expires'];
 
     // Dates
     protected $useTimestamps = true;
@@ -28,12 +28,13 @@ class UserModel extends Model
      */
     public function findUserByIdentifier(string $identifier)
     {
-        // Join dengan tabel roles untuk mendapatkan nama_role
-        return $this->db->table('users')
-            ->select('users.*, roles.nama_role')
-            ->join('roles', 'roles.id = users.role_id')
-            ->where('username', $identifier)
-            ->orWhere('email', $identifier)
+        // Sesuaikan dengan struktur tabel 'user' (migration CreateUserTable)
+        return $this->db->table('user')
+            ->select('user.*')
+            ->groupStart()
+                ->where('username', $identifier)
+                ->orWhere('email', $identifier)
+            ->groupEnd()
             ->get()
             ->getRowArray();
     }

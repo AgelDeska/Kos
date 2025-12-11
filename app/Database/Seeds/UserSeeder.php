@@ -8,6 +8,9 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
+        // Clear existing data to avoid duplicate key errors
+        $this->db->table('user')->truncate();
+
         $data = [
             [
                 'username'      => 'admin',

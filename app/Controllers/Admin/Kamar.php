@@ -12,10 +12,44 @@ class Kamar extends BaseController
         $this->kamarModel = new KamarModel();
     }
 
-    // [C R U D] - R (Read/Index): Menampilkan daftar semua kamar
+    // [C R U D] - R (Read/Index): Menampilkan daftar semua kamar dengan filter dan search
     public function index()
     {
-        $data['kamars'] = $this->kamarModel->orderBy('nomor_kamar', 'ASC')->findAll();
+        $search = $this->request->getGet('search') ?? '';
+        $status = $this->request->getGet('status') ?? '';
+        $sortBy = $this->request->getGet('sortBy') ?? 'nomor_kamar';
+        $sortOrder = $this->request->getGet('sortOrder') ?? 'ASC';
+
+        $query = $this->kamarModel;
+
+        // Filter berdasarkan search (nomor kamar atau tipe kamar)
+        if (!empty($search)) {
+            $query = $query->groupStart()
+                ->like('nomor_kamar', $search)
+                ->orLike('tipe_kamar', $search)
+                ->orLike('deskripsi', $search)
+                ->groupEnd();
+        }
+
+        // Filter berdasarkan status
+        if (!empty($status)) {
+            $query = $query->where('status', $status);
+        }
+
+        // Sort (hanya izinkan kolom yang valid)
+        $allowedColumns = ['nomor_kamar', 'tipe_kamar', 'kapasitas', 'harga', 'status'];
+        if (in_array($sortBy, $allowedColumns)) {
+            $query = $query->orderBy($sortBy, strtoupper($sortOrder));
+        } else {
+            $query = $query->orderBy('nomor_kamar', 'ASC');
+        }
+
+        $data['kamars'] = $query->findAll();
+        $data['search'] = $search;
+        $data['status'] = $status;
+        $data['sortBy'] = $sortBy;
+        $data['sortOrder'] = $sortOrder;
+
         return view('admin/kamar/index', $data); // View daftar tabel kamar
     }
 
@@ -41,8 +75,13 @@ class Kamar extends BaseController
 
         if ($fileFoto && $fileFoto->isValid() && ! $fileFoto->hasMoved()) {
             $namaFoto = $fileFoto->getRandomName();
-            // Pindahkan file ke folder publik (pastikan folder 'img/kamar' ada)
-            $fileFoto->move('./img/kamar', $namaFoto); 
+            // Pindahkan file ke folder publik (pastikan folder 'public/img/kamar' ada)
+            try {
+                $fileFoto->move(FCPATH . 'img/kamar', $namaFoto);
+            } catch (\Exception $e) {
+                log_message('error', 'Kamar::store - foto upload gagal: ' . $e->getMessage());
+                $namaFoto = null;
+            }
         }
 
         // 3. Simpan Data ke Database
@@ -94,13 +133,19 @@ class Kamar extends BaseController
         $fileFoto = $this->request->getFile('foto_kamar');
         $namaFoto = $kamarLama['foto_kamar']; // Default ke nama foto lama
 
-        if ($fileFoto->isValid() && ! $fileFoto->hasMoved()) {
+        if ($fileFoto && $fileFoto->isValid() && ! $fileFoto->hasMoved()) {
             // Hapus foto lama jika ada
-            if ($kamarLama['foto_kamar'] && file_exists('./img/kamar/' . $kamarLama['foto_kamar'])) {
-                unlink('./img/kamar/' . $kamarLama['foto_kamar']);
+            if (! empty($kamarLama['foto_kamar']) && file_exists(FCPATH . 'img/kamar/' . $kamarLama['foto_kamar'])) {
+                @unlink(FCPATH . 'img/kamar/' . $kamarLama['foto_kamar']);
             }
             $namaFoto = $fileFoto->getRandomName();
-            $fileFoto->move('./img/kamar', $namaFoto);
+            try {
+                $fileFoto->move(FCPATH . 'img/kamar', $namaFoto);
+            } catch (\Exception $e) {
+                log_message('error', 'Kamar::update - foto upload gagal: ' . $e->getMessage());
+                // jika gagal, kembalikan ke nama lama
+                $namaFoto = $kamarLama['foto_kamar'];
+            }
         }
 
         // 3. Update Data ke Database
@@ -117,6 +162,24 @@ class Kamar extends BaseController
         return redirect()->to('/admin/kamar')->with('success', 'Data Kamar berhasil diperbarui.');
     }
 
+    // Quick status update from index (AJAX-compatible via POST)
+    public function updateStatus($kamar_id)
+    {
+        $kamar = $this->kamarModel->find($kamar_id);
+        if (!$kamar) {
+            return redirect()->back()->with('error', 'Kamar tidak ditemukan.');
+        }
+
+        $status = $this->request->getPost('status');
+        $allowed = ['Tersedia', 'Di Booking', 'Terisi', 'Perbaikan'];
+        if (!in_array($status, $allowed)) {
+            return redirect()->back()->with('error', 'Status tidak valid.');
+        }
+
+        $this->kamarModel->update($kamar_id, ['status' => $status]);
+        return redirect()->back()->with('success', 'Status kamar berhasil diperbarui.');
+    }
+
     // [C R U D] - D (Delete): Menghapus data kamar
     public function delete($kamar_id)
     {
@@ -129,8 +192,8 @@ class Kamar extends BaseController
         // Karena kita menggunakan CASCADE di migrasi, data terkait akan ikut terhapus.
         try {
             // Hapus file foto jika ada
-            if ($kamar['foto_kamar'] && file_exists('./img/kamar/' . $kamar['foto_kamar'])) {
-                unlink('./img/kamar/' . $kamar['foto_kamar']);
+            if (! empty($kamar['foto_kamar']) && file_exists(FCPATH . 'img/kamar/' . $kamar['foto_kamar'])) {
+                @unlink(FCPATH . 'img/kamar/' . $kamar['foto_kamar']);
             }
             
             $this->kamarModel->delete($kamar_id);

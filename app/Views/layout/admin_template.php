@@ -1,74 +1,288 @@
+<?php $uri = service('uri'); $seg2 = $uri->getSegment(2) ?? 'dashboard'; ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | SmartKos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title><?= $title ?? 'Dashboard Admin' ?> | SmartKos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+        
         .sidebar { 
-            position: fixed; top: 0; bottom: 0; left: 0; 
-            z-index: 1000; padding: 48px 0 0; box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1); 
-            background-color: #343a40; color: white;
+            transition: all 0.3s ease;
+            background: linear-gradient(180deg, #111827 0%, #0b1220 100%);
         }
-        .sidebar-sticky { position: relative; top: 0; height: calc(100vh - 48px); overflow-x: hidden; overflow-y: auto; }
-        .main-content { margin-left: 240px; }
-        .sidebar a { color: #dee2e6; padding: 10px 15px; display: block; text-decoration: none; }
-        .sidebar a:hover { background-color: #495057; color: white; }
-        .sidebar .active { color: #ffc107; border-left: 3px solid #ffc107; background-color: #495057; }
-        .navbar-brand { color: white !important; }
+        .sidebar-item { 
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+        }
+        .sidebar-item:hover { 
+            background-color: rgba(59, 130, 246, 0.10);
+            transform: translateX(2px);
+        }
+        .sidebar-item a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .sidebar-item a:hover { color: #fff; }
+        .sidebar-item a.active {
+            background: linear-gradient(90deg, rgba(59,130,246,0.25) 0%, rgba(37,99,235,0.15) 100%);
+            color: #fff;
+            border-left: 3px solid #3b82f6;
+            padding-left: calc(1rem - 3px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Header styling */
+        .admin-header {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.85);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .smooth-transition { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Common card + button styles for admin */
+        .card { background: #fff; border-radius: 12px; border: 1px solid rgba(15,23,42,0.04); box-shadow: 0 8px 24px rgba(2,6,23,0.06); overflow: hidden; }
+        .card .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(15,23,42,0.04); }
+        .card .card-body { padding: 1rem 1.25rem; }
+
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: .5rem .9rem; border-radius: 10px; font-weight:600; cursor:pointer; }
+        .btn-primary { background: linear-gradient(90deg,#2563eb,#1d4ed8); color:#fff; box-shadow: 0 8px 20px rgba(37,99,235,0.16); }
+        .btn-ghost { background: transparent; border:1px solid rgba(15,23,42,0.06); color:#0f172a; }
+        .btn-danger { background: linear-gradient(90deg,#ef4444,#dc2626); color:#fff; }
+        .btn-sm { padding:.35rem .6rem; font-size: .9rem; border-radius:8px; }
+
+        /* Table helpers */
+        .table-styled thead th { background: #f8fafc; position: sticky; top:0; z-index:1; }
+        .table-styled tbody tr:hover { background: #fbfdff; }
+        .table-styled td, .table-styled th { padding: .9rem 1rem; }
+
+        /* Simple modal (centered) */
+        .modal-backdrop { position: fixed; inset:0; background: rgba(2,6,23,0.5); display:flex; align-items:center; justify-content:center; z-index:60; }
+        .modal { background:#fff; border-radius:12px; padding:18px; max-width:520px; width:100%; box-shadow:0 18px 40px rgba(2,6,23,0.25); }
     </style>
+    <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
-<body>
-<nav class="navbar navbar-dark bg-dark fixed-top flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/admin/dashboard">SmartKos Admin</a>
-    <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-            <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </li>
-    </ul>
-</nav>
+<body class="bg-slate-50 flex h-screen overflow-hidden">
 
-<div class="container-fluid">
-    <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-            <div class="sidebar-sticky pt-3">
-                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span><?= session()->get('role') ?> Menu</span>
-                </h6>
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link <?= uri_string() == 'admin/dashboard' ? 'active' : '' ?>" href="/admin/dashboard"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
-                    
-                    <?php if (session()->get('role') == 'Admin'): ?>
-                        <li class="nav-item"><a class="nav-link <?= uri_string() == 'admin/kamar' ? 'active' : '' ?>" href="/admin/kamar"><i class="bi bi-grid-fill"></i> Kelola Kamar</a></li>
-                        <li class="nav-item"><a class="nav-link <?= uri_string() == 'admin/penyewa' ? 'active' : '' ?>" href="/admin/penyewa"><i class="bi bi-person-badge-fill"></i> Kelola Penyewa</a></li>
-                        <li class="nav-item"><a class="nav-link <?= uri_string() == 'admin/booking' ? 'active' : '' ?>" href="/admin/booking"><i class="bi bi-calendar-check-fill"></i> Verifikasi Booking</a></li>
-                        <li class="nav-item"><a class="nav-link <?= uri_string() == 'admin/pembayaran' ? 'active' : '' ?>" href="/admin/pembayaran"><i class="bi bi-currency-dollar"></i> Kelola Pembayaran</a></li>
-                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"><span>Laporan</span></h6>
-                        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-file-earmark-bar-graph-fill"></i> Laporan Keuangan</a></li>
-                    <?php endif; ?>
-
-                    <?php if (session()->get('role') == 'Penyewa'): ?>
-                        <li class="nav-item"><a class="nav-link <?= uri_string() == 'penyewa/riwayat-booking' ? 'active' : '' ?>" href="/penyewa/riwayat-booking"><i class="bi bi-clock-history"></i> Riwayat Booking</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/penyewa/pembayaran"><i class="bi bi-cash-stack"></i> Pembayaran Saya</a></li>
-                    <?php endif; ?>
-                    
-                </ul>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 text-gray-100 flex flex-col h-full z-30 shadow-2xl">
+        <!-- Logo Section -->
+        <div class="p-6 border-b border-gray-800 bg-gradient-to-br from-blue-600 to-blue-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-key text-blue-600 text-lg font-bold"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">SmartKos</h1>
+                    <p class="text-xs text-blue-100">Admin Panel</p>
+                </div>
             </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3">
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/dashboard') ?>" class="<?= ($seg2==='dashboard') ? 'active' : '' ?>">
+                        <i class="fas fa-chart-line w-5 text-blue-400"></i>
+                        <span class="ml-3 font-medium">Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/kamar') ?>" class="<?= ($seg2==='kamar') ? 'active' : '' ?>">
+                        <i class="fas fa-door-open w-5 text-purple-400"></i>
+                        <span class="ml-3 font-medium">Kelola Kamar</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/penyewa') ?>" class="<?= ($seg2==='penyewa') ? 'active' : '' ?>">
+                        <i class="fas fa-users w-5 text-green-400"></i>
+                        <span class="ml-3 font-medium">Kelola Penyewa</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/booking') ?>" class="<?= ($seg2==='booking') ? 'active' : '' ?>">
+                        <i class="fas fa-calendar-check w-5 text-orange-400"></i>
+                        <span class="ml-3 font-medium">Verifikasi Booking</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/pembayaran') ?>" class="<?= ($seg2==='pembayaran') ? 'active' : '' ?>">
+                        <i class="fas fa-credit-card w-5 text-pink-400"></i>
+                        <span class="ml-3 font-medium">Kelola Pembayaran</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= base_url('admin/peta') ?>" class="<?= ($seg2==='peta') ? 'active' : '' ?>">
+                        <i class="fas fa-map-marked-alt w-5 text-emerald-400"></i>
+                        <span class="ml-3 font-medium">Kelola Peta Lokasi</span>
+                    </a>
+                </li>
+            </ul>
         </nav>
+        
+        <!-- Bottom Section -->
+        <div class="p-4 border-t border-gray-800 space-y-3">
+            <button onclick="document.getElementById('logout-form').submit()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg smooth-transition flex items-center justify-center">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+            <form id="logout-form" action="<?= base_url('auth/logout') ?>" method="POST" style="display: none;"></form>
+        </div>
+    </aside>
 
-        <main role="main" class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2"><?= $title ?? 'Dashboard' ?></h1>
+    <!-- Main Content Area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+        <!-- Top Header -->
+        <header class="admin-header px-4 md:px-6 py-4 flex flex-col gap-3 sticky top-0 z-20 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 lg:hidden p-2 hover:bg-gray-100 rounded-lg smooth-transition" aria-label="Toggle Sidebar">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-none tracking-tight"><?= $title ?? 'Dashboard' ?></h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm md:text-base text-gray-600 font-medium hidden sm:inline">Admin Panel</span>
+                    <div class="relative" id="profileWrapper">
+                        <button type="button" id="profileBtn" title="Akun" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-user-shield text-white"></i>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-30">
+                            <div class="px-4 py-3 text-sm">
+                                <p class="font-semibold text-gray-900">Admin</p>
+                                <p class="text-gray-500">Panel</p>
+                            </div>
+                            <div class="border-t border-gray-200"></div>
+                            <a href="<?= base_url('profile') ?>" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-user-circle text-gray-500 w-4"></i>
+                                <span>Profil</span>
+                            </a>
+                            <button id="logoutAction" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt w-4"></i>
+                                <span>Keluar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <?= view('layout/alert_message') ?>
-            <?= $this->renderSection('content') ?>
+            <!-- Breadcrumbs -->
+            <nav class="hidden md:flex items-center text-sm text-gray-500">
+                <a href="<?= base_url('admin/dashboard') ?>" class="hover:text-blue-600 inline-flex items-center gap-2"><i class="fas fa-home"></i>Dashboard</a>
+                <?php if (!empty($title) && strtolower($title) !== 'dashboard'): ?>
+                    <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    <span class="text-gray-700 font-medium"><?= esc($title) ?></span>
+                <?php endif; ?>
+            </nav>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-6 max-w-7xl mx-auto w-full">
+                <?= $this->renderSection('content') ?>
+            </div>
         </main>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.flex-1');
+        const toggleButton = document.getElementById('sidebar-toggle');
+
+        // Initial setup for mobile (sidebar hidden)
+        if (window.innerWidth < 1024) {
+            sidebar.classList.add('hidden', '-translate-x-full');
+            if (mainContent) mainContent.style.marginLeft = '0';
+        }
+
+        toggleButton?.addEventListener('click', () => {
+            if (sidebar.classList.contains('hidden')) {
+                // Show sidebar
+                sidebar.classList.remove('hidden', '-translate-x-full');
+                sidebar.classList.add('absolute', 'top-0', 'left-0');
+            } else {
+                // Hide sidebar
+                sidebar.classList.add('hidden', '-translate-x-full');
+                sidebar.classList.remove('absolute', 'top-0', 'left-0');
+            }
+        });
+
+        // Responsive behavior
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.remove('hidden', '-translate-x-full', 'absolute', 'top-0', 'left-0');
+                if (mainContent) mainContent.style.marginLeft = '0';
+            } else if (window.innerWidth < 1024 && !sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('hidden', '-translate-x-full', 'absolute', 'top-0', 'left-0');
+            }
+        });
+
+        // Profile dropdown & logout confirm
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const logoutAction = document.getElementById('logoutAction');
+        const logoutForm = document.getElementById('logout-form');
+
+        function closeProfileMenu() { profileMenu?.classList.add('hidden'); }
+
+        profileBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu?.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileMenu || !profileBtn) return;
+            if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                closeProfileMenu();
+            }
+        }, { passive: true });
+
+        logoutAction?.addEventListener('click', () => {
+            closeProfileMenu();
+            if (confirm('Anda yakin ingin keluar dari admin panel?')) {
+                logoutForm?.submit();
+            }
+        });
+
+        // Generic data-confirm handler for links/buttons
+        document.addEventListener('click', function (e) {
+            const el = e.target.closest('[data-confirm]');
+            if (!el) return;
+            e.preventDefault();
+            const message = el.getAttribute('data-confirm') || 'Apakah Anda yakin?';
+            const href = el.getAttribute('href');
+            const formMethod = el.getAttribute('data-method') || 'GET';
+
+            // Show native confirm for now
+            if (confirm(message)) {
+                if (href) window.location = href;
+                else {
+                    // If meant to submit a form, attempt to find target
+                    const target = document.querySelector(el.getAttribute('data-target'));
+                    if (target && target.tagName === 'FORM') target.submit();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
