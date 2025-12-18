@@ -71,8 +71,7 @@ class Penyewa extends BaseController
     // [C R U D] - C (Create): Menampilkan form tambah penyewa
     public function create()
     {
-        $data['validation'] = \Config\Services::validation();
-        return view('admin/penyewa/create', $data);
+        return view('admin/penyewa/create');
     }
 
     // [C R U D] - C (Store): Menyimpan data penyewa baru
@@ -118,7 +117,9 @@ class Penyewa extends BaseController
         if (!$data['penyewa'] || $data['penyewa']['role'] !== 'Penyewa') {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Penyewa tidak ditemukan.');
         }
+        
         $data['validation'] = \Config\Services::validation();
+        
         return view('admin/penyewa/edit', $data);
     }
 
@@ -139,8 +140,8 @@ class Penyewa extends BaseController
 
         // Jika ada password baru, validasi password
         if (!empty($this->request->getPost('password'))) {
-            $rules['password'] = 'min_length[6]|max_length[255]';
-            $rules['confirm_password'] = 'matches[password]';
+            $rules['password'] = 'required|min_length[6]|max_length[255]';
+            $rules['confirm_password'] = 'required|matches[password]';
         }
 
         if (!$this->validate($rules)) {

@@ -6,7 +6,7 @@
 <div class="mb-8 flex items-center justify-between">
     <div>
         <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-            <i class="fas fa-credit-card text-green-600 mr-3"></i>Kelola Pembayaran
+            <i class="fas fa-credit-card text-blue-600 mr-3"></i>Kelola Pembayaran
         </h2>
         <p class="text-gray-600 mt-1">Verifikasi dan kelola transaksi pembayaran penyewa</p>
     </div>
@@ -31,9 +31,9 @@
             <!-- Status Filter -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-filter text-purple-600 mr-2"></i>Status Pembayaran
+                    <i class="fas fa-filter text-blue-600 mr-2"></i>Status Pembayaran
                 </label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="">Semua Status</option>
                     <option value="Menunggu Verifikasi" <?= $status === 'Menunggu Verifikasi' ? 'selected' : '' ?>>Menunggu Verifikasi</option>
                     <option value="Lunas" <?= $status === 'Lunas' ? 'selected' : '' ?>>Lunas</option>
@@ -44,9 +44,9 @@
             <!-- Sort By -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-arrow-up-down text-green-600 mr-2"></i>Urutkan Berdasarkan
+                    <i class="fas fa-arrow-up-down text-blue-600 mr-2"></i>Urutkan Berdasarkan
                 </label>
-                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="tanggal_bayar" <?= $sortBy === 'tanggal_bayar' ? 'selected' : '' ?>>Tanggal Pembayaran</option>
                     <option value="jumlah" <?= $sortBy === 'jumlah' ? 'selected' : '' ?>>Jumlah</option>
                     <option value="username" <?= $sortBy === 'username' ? 'selected' : '' ?>>Nama Penyewa</option>
@@ -57,7 +57,7 @@
             <!-- Sort Order -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-sort text-orange-600 mr-2"></i>Urutan
+                    <i class="fas fa-sort text-blue-600 mr-2"></i>Urutan
                 </label>
                 <div class="flex gap-2">
                     <button type="submit" name="sortOrder" value="ASC" class="flex-1 px-4 py-2 <?= $sortOrder === 'ASC' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' ?> rounded-lg hover:bg-blue-600 hover:text-white transition font-semibold">
@@ -86,7 +86,7 @@
 <div class="card">
     <div class="card-header flex items-center justify-between">
         <div class="flex items-center">
-            <i class="fas fa-receipt text-green-600 text-xl mr-3"></i>
+            <i class="fas fa-receipt text-blue-600 text-xl mr-3"></i>
             <h3 class="text-lg font-bold text-gray-900">Daftar Transaksi Pembayaran</h3>
             <span class="ml-3 px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm font-semibold">
                 <?= count($pembayarans ?? []) ?> Transaksi
@@ -104,13 +104,14 @@
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Jenis</th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Bayar</th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Bukti</th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
                 <?php if (empty($pembayarans)): ?>
                     <tr>
-                        <td colspan="8" class="px-6 py-12 text-center">
+                        <td colspan="9" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
                                 <p class="text-gray-500 font-medium">Tidak ada data pembayaran yang tercatat</p>
@@ -129,7 +130,21 @@
                                 <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                                     <?= substr(esc($p['username']), 0, 1) ?>
                                 </div>
-                                <span class="ml-2 text-sm font-semibold text-gray-900"><?= esc($p['username']) ?></span>
+                                <div class="ml-2">
+                                    <div class="text-sm font-semibold text-gray-900"><?= esc($p['nama_penyewa']) ?></div>
+                                    <div class="text-xs text-gray-500">
+                                        <?php
+                                            $bookingStatus = $p['booking_status'] ?? '';
+                                            if (in_array($bookingStatus, ['Diterima', 'Selesai'])) {
+                                                $badgeClass = $bookingStatus === 'Selesai' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+                                                $icon = $bookingStatus === 'Selesai' ? 'fa-check-circle' : 'fa-check-circle';
+                                                echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ' . $badgeClass . '"><i class="fas ' . $icon . ' mr-1"></i>' . esc($bookingStatus) . '</span>';
+                                            } else {
+                                                echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-clock mr-1"></i>Pending</span>';
+                                            }
+                                        ?>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -158,6 +173,18 @@
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold <?= $statusClass ?>">
                                 <i class="fas <?= $statusIcon ?> mr-1"></i><?= esc($p['status']) ?>
                             </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <?php if (!empty($p['bukti_transfer'])): ?>
+                                <a href="<?= base_url('uploads/bukti_pembayaran/' . esc($p['bukti_transfer'])) ?>" 
+                                   target="_blank" class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                    <i class="fas fa-image mr-1"></i>Lihat Bukti
+                                </a>
+                            <?php else: ?>
+                                <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
+                                    <i class="fas fa-minus mr-1"></i>Tidak Ada
+                                </span>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <?php if ($p['status'] == 'Menunggu Verifikasi'): ?>

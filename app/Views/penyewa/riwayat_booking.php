@@ -19,7 +19,6 @@
             <option value="">Semua Status</option>
             <option value="Menunggu">Menunggu</option>
             <option value="Diterima">Diterima</option>
-            <option value="Aktif">Aktif</option>
             <option value="Selesai">Selesai</option>
         </select>
         <a href="<?= base_url('katalog') ?>" class="btn-primary">
@@ -42,7 +41,7 @@
         </div>
     <?php else: ?>
         <?php foreach ($bookings as $b): ?>
-            <div class="card rounded-xl shadow-md hover:shadow-lg transition overflow-hidden">
+            <div class="card rounded-xl shadow-md hover:shadow-lg transition overflow-hidden" data-booking-id="<?= esc($b['booking_id']) ?>" data-status="<?= esc($b['status']) ?>" data-kamar="<?= esc($b['nomor_kamar'] ?? '') ?>">
                 <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
@@ -61,14 +60,12 @@
                                 $statusBadges = [
                                     'Menunggu' => 'badge-warning',
                                     'Diterima' => 'badge-info',
-                                    'Aktif' => 'badge-success',
-                                    'Selesai' => 'badge-danger',
+                                    'Selesai' => 'badge-success',
                                 ];
                                 $statusIcons = [
                                     'Menunggu' => 'fa-hourglass-half',
                                     'Diterima' => 'fa-check-circle',
-                                    'Aktif' => 'fa-check',
-                                    'Selesai' => 'fa-times-circle',
+                                    'Selesai' => 'fa-check',
                                 ];
                                 $status = $b['status'] ?? 'Menunggu';
                             ?>
@@ -104,15 +101,11 @@
                             </p>
                         </div>
 
-                        <!-- Tanggal Akhir Sewa -->
+                        <!-- Total Biaya / DP -->
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-xs text-gray-500 font-semibold uppercase mb-2">Berakhir Sewa</p>
-                            <p class="text-lg font-bold text-gray-900">
-                                <?php 
-                                    $endDate = date('Y-m-d', strtotime($b['tanggal_mulai_sewa'] . ' + ' . $b['durasi_sewa_bulan'] . ' months'));
-                                    echo date('d M Y', strtotime($endDate));
-                                ?>
-                            </p>
+                            <p class="text-xs text-gray-500 font-semibold uppercase mb-2">Total Biaya</p>
+                            <p class="text-lg font-bold text-gray-900">Rp <?= number_format($b['total_biaya'] ?? 0, 0, ',', '.') ?></p>
+                            <p class="text-sm text-gray-600 mt-1">DP: Rp <?= number_format($b['dp_amount'] ?? 0, 0, ',', '.') ?></p>
                         </div>
                     </div>
 
@@ -126,13 +119,18 @@
                                 <i class="fas fa-eye mr-2"></i>Lihat Detail
                             </a>
                         <?php elseif ($status == 'Menunggu'): ?>
-                            <button class="btn-secondary flex items-center justify-center opacity-60" disabled>
-                                <i class="fas fa-hourglass-half mr-2"></i>Menunggu Konfirmasi Admin
-                            </button>
-                            <a href="<?= base_url('penyewa/booking/' . $b['booking_id'] . '/detail') ?>" class="btn-secondary flex items-center justify-center">
-                                <i class="fas fa-eye mr-2"></i>Lihat Detail
-                            </a>
-                        <?php elseif ($status == 'Aktif'): ?>
+                            <div class="flex gap-2">
+                                <form action="<?= base_url('penyewa/booking/' . $b['booking_id'] . '/batal') ?>" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan booking ini?')">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn-danger flex items-center justify-center">
+                                        <i class="fas fa-times mr-2"></i>Batal Booking
+                                    </button>
+                                </form>
+                                <a href="<?= base_url('penyewa/booking/' . $b['booking_id'] . '/detail') ?>" class="btn-secondary flex items-center justify-center">
+                                    <i class="fas fa-eye mr-2"></i>Lihat Detail
+                                </a>
+                            </div>
+                        <?php elseif ($status == 'Selesai'): ?>
                             <a href="<?= base_url('penyewa/pembayaran/form-bulanan/' . $b['booking_id']) ?>" class="btn-primary flex items-center justify-center">
                                 <i class="fas fa-credit-card mr-2"></i>Bayar Cicilan
                             </a>
@@ -158,16 +156,17 @@
     const bookingCards = document.querySelectorAll('[data-booking-id]');
 
     function filterBookings() {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = (searchInput.value || '').toLowerCase();
         const statusTerm = statusFilter.value;
 
         bookingCards.forEach(card => {
-            const bookingId = card.getAttribute('data-booking-id').toLowerCase();
+            const bookingId = (card.getAttribute('data-booking-id') || '').toLowerCase();
+            const kamar = (card.getAttribute('data-kamar') || '').toLowerCase();
             const status = card.getAttribute('data-status');
-            
-            const matchSearch = bookingId.includes(searchTerm);
+
+            const matchSearch = !searchTerm || bookingId.includes(searchTerm) || kamar.includes(searchTerm);
             const matchStatus = !statusTerm || status === statusTerm;
-            
+
             card.style.display = (matchSearch && matchStatus) ? '' : 'none';
         });
     }

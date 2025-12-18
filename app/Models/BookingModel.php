@@ -17,7 +17,8 @@ class BookingModel extends Model
     // Field yang diizinkan untuk diisi
     protected $allowedFields = [
         'user_id', 'kamar_id', 'tanggal_booking', 'durasi_sewa_bulan', 
-        'tanggal_mulai_sewa', 'tanggal_selesai_sewa', 'status'
+        'tanggal_mulai_sewa', 'tanggal_selesai_sewa', 'status',
+        'total_biaya', 'dp_amount'
     ];
 
     // Aturan Validasi
@@ -26,25 +27,30 @@ class BookingModel extends Model
         'kamar_id' => 'required|integer',
         'tanggal_booking' => 'required|valid_date',
         'durasi_sewa_bulan' => 'required|integer|greater_than[0]',
-        'status' => 'required|in_list[Menunggu,Diterima,Ditolak,Aktif]',
+        'status' => 'required|in_list[Menunggu,Diterima,Ditolak,Selesai]',
     ];
 
     /**
      * Metode untuk mendapatkan detail booking beserta data user dan kamar (Join)
      * @param int|null $id
+     * @param int|null $userId - Filter berdasarkan user_id (untuk penyewa)
      * @return array
      */
-    public function getBookingDetail($id = null)
+    public function getBookingDetail($id = null, $userId = null)
     {
         $builder = $this->db->table($this->table);
-        $builder->select('booking.*, user.username, user.nama as nama_penyewa, kamar.nomor_kamar, kamar.harga');
+        $builder->select('booking.*, user.username, user.nama as nama_penyewa, kamar.nomor_kamar, kamar.harga, kamar.tipe_kamar');
         $builder->join('user', 'user.user_id = booking.user_id');
         $builder->join('kamar', 'kamar.kamar_id = booking.kamar_id');
 
-        if ($id) {
-            return $builder->where('booking.booking_id', $id)->first();
+        if ($userId) {
+            $builder->where('booking.user_id', $userId);
         }
 
-        return $builder->get()->getResultArray();
+        if ($id) {
+            return $builder->where('booking.booking_id', $id)->get()->getFirstRow('array');
+        }
+
+        return $builder->orderBy('booking.created_at', 'DESC')->get()->getResultArray();
     }
 }

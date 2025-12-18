@@ -203,7 +203,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900"><?= esc($booking['username'] ?? 'N/A') ?></p>
-                                    <p class="text-xs text-gray-500">ID: #<?= esc($booking['booking_id']) ?></p>
+                                    <p class="text-xs text-gray-500">Nomor: #<?= esc($booking['booking_id']) ?></p>
                                 </div>
                             </div>
                         </td>

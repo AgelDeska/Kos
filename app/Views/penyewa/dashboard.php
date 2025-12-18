@@ -24,8 +24,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-blue-100 text-sm font-medium mb-1">Total Booking</p>
-                <p class="text-4xl font-bold">0</p>
-                <p class="text-blue-100 text-xs mt-2">Kamar yang sedang disewa</p>
+                <p class="text-4xl font-bold"><?= esc($stats['total_booking'] ?? 0) ?></p>
+                <p class="text-blue-100 text-xs mt-2">Total booking yang dibuat</p>
             </div>
             <i class="fas fa-door-open text-4xl opacity-20"></i>
         </div>
@@ -36,7 +36,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-pink-100 text-sm font-medium mb-1">Pembayaran Pending</p>
-                <p class="text-4xl font-bold">Rp 0</p>
+                <p class="text-4xl font-bold"><?= esc($stats['pembayaran_pending'] ?? 0) ?></p>
                 <p class="text-pink-100 text-xs mt-2">Menunggu konfirmasi</p>
             </div>
             <i class="fas fa-clock text-4xl opacity-20"></i>
@@ -48,8 +48,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-cyan-100 text-sm font-medium mb-1">Pembayaran Terverifikasi</p>
-                <p class="text-4xl font-bold">Rp 0</p>
-                <p class="text-cyan-100 text-xs mt-2">Sudah dikonfirmasi</p>
+                <p class="text-4xl font-bold">Rp <?= number_format($stats['pembayaran_terverifikasi'] ?? 0, 0, ',', '.') ?></p>
+                <p class="text-cyan-100 text-xs mt-2">Total sudah diverifikasi</p>
             </div>
             <i class="fas fa-check-circle text-4xl opacity-20"></i>
         </div>
@@ -60,8 +60,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-yellow-100 text-sm font-medium mb-1">Jatuh Tempo</p>
-                <p class="text-2xl font-bold">-</p>
-                <p class="text-yellow-100 text-xs mt-2">Belum ada booking aktif</p>
+                <p class="text-2xl font-bold"><?= esc($stats['jatuh_tempo'] ?? '-') ?></p>
+                <p class="text-yellow-100 text-xs mt-2">Booking aktif</p>
             </div>
             <i class="fas fa-calendar text-4xl opacity-20"></i>
         </div>

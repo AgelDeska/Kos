@@ -50,6 +50,14 @@
                             <p class="text-gray-600">Durasi</p>
                             <p class="font-semibold text-gray-900"><?= esc($booking['durasi_sewa_bulan']) ?> Bulan</p>
                         </div>
+                        <div>
+                            <p class="text-gray-600">Total Biaya</p>
+                            <p class="font-semibold text-gray-900">Rp <?= number_format($booking['total_biaya'] ?? 0, 0, ',', '.') ?></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">DP 50%</p>
+                            <p class="font-semibold text-green-600">Rp <?= number_format($booking['dp_amount'] ?? 0, 0, ',', '.') ?></p>
+                        </div>
                     </div>
                 </div>
 
@@ -74,19 +82,20 @@
                     <label for="jumlah" class="block text-sm font-semibold text-gray-900 mb-3">
                         <i class="fas fa-money-bill-wave text-green-600 mr-2"></i>Jumlah Pembayaran (Rp)
                     </label>
-                    <input 
-                        type="number" 
-                        id="jumlah" 
-                        name="jumlah" 
-                        placeholder="Contoh: 500000" 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <input
+                        type="number"
+                        id="jumlah"
+                        name="jumlah"
+                        value="<?= esc($booking['dp_amount'] ?? 0) ?>"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                        readonly
                         required
                         min="0"
                         step="1000"
                     >
-                    <p class="text-xs text-gray-500 mt-2">
-                        <i class="fas fa-lightbulb mr-1"></i>
-                        Masukkan jumlah uang yang Anda transfer. Biasanya sama dengan harga 1 bulan kamar.
+                    <p class="text-xs text-green-600 mt-2 font-medium">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Jumlah DP sudah ditentukan berdasarkan kalkulasi booking (50% dari total biaya).
                     </p>
                 </div>
 
@@ -109,10 +118,13 @@
                         <i class="fas fa-upload text-orange-600 mr-2"></i>Upload Bukti Pembayaran
                     </label>
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('bukti_transfer').click()">
-                        <input type="file" id="bukti_transfer" name="bukti_transfer" class="hidden" accept=".jpg,.jpeg,.png,.pdf" required>
+                        <input type="file" id="bukti_transfer" name="bukti_transfer" class="hidden" accept=".jpg,.jpeg,.png,.pdf" required onchange="previewImage(event)">
                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
                         <p class="text-gray-900 font-semibold mb-1">Klik atau drag file di sini</p>
                         <p class="text-sm text-gray-600">Format: JPG, PNG, atau PDF (Maksimal 5MB)</p>
+                    </div>
+                    <div id="imagePreview" class="mt-4 hidden">
+                        <img id="previewImg" src="" alt="Preview Bukti" class="max-w-full h-auto rounded-lg shadow-md">
                     </div>
                     <p id="fileName" class="text-sm text-gray-600 mt-3"></p>
                 </div>
@@ -203,6 +215,24 @@
         const fileName = e.target.files[0]?.name || '';
         document.getElementById('fileName').textContent = fileName ? `✓ File dipilih: ${fileName}` : '';
     });
+
+    // Preview gambar
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.classList.add('hidden');
+        }
+    }
 </script>
 
 <?= $this->endSection() ?>

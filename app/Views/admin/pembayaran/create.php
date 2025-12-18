@@ -9,7 +9,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-                <i class="fas fa-receipt text-green-600 mr-3"></i>Catat Pembayaran Manual
+                <i class="fas fa-receipt text-blue-600 mr-3"></i>Catat Pembayaran Manual
             </h2>
             <p class="text-gray-600 mt-1">Catat transaksi pembayaran langsung dari penyewa</p>
         </div>
@@ -19,7 +19,22 @@
     </div>
 </div>
 
-<!-- Form Container -->
+<!-- Error Messages -->
+<?php if (session()->getFlashdata('errors')): ?>
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-red-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-red-900 mb-2">Terjadi kesalahan validasi:</p>
+                <ul class="list-disc list-inside text-red-800 space-y-1">
+                    <?php foreach(session()->getFlashdata('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Form Section -->
     <div class="lg:col-span-2">
@@ -32,7 +47,7 @@
                         <i class="fas fa-user text-green-600 mr-2"></i>Pilih Penyewa
                     </label>
                     <select name="user_id" id="user_id" required
-                            class="w-full px-4 py-3 border <?= $validation->hasError('user_id') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
+                            class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['user_id'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
                         <option value="">-- Pilih Penyewa --</option>
                         <?php foreach ($users as $user): ?>
                             <option value="<?= esc($user['user_id']) ?>" <?= old('user_id') == $user['user_id'] ? 'selected' : '' ?>>
@@ -40,9 +55,9 @@
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <?php if ($validation->hasError('user_id')): ?>
+                    <?php if (isset(session()->getFlashdata('errors')['user_id'])): ?>
                         <p class="mt-2 text-sm text-red-600 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('user_id') ?>
+                            <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['user_id'] ?>
                         </p>
                     <?php endif; ?>
                 </div>
@@ -53,7 +68,7 @@
                         <i class="fas fa-door-open text-green-600 mr-2"></i>Pilih Kamar
                     </label>
                     <select name="kamar_id" id="kamar_id" required
-                            class="w-full px-4 py-3 border <?= $validation->hasError('kamar_id') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
+                            class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['kamar_id'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
                         <option value="">-- Pilih Kamar --</option>
                         <?php foreach ($kamars as $kamar): ?>
                             <option value="<?= esc($kamar['kamar_id']) ?>" <?= old('kamar_id') == $kamar['kamar_id'] ? 'selected' : '' ?>>
@@ -61,9 +76,9 @@
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <?php if ($validation->hasError('kamar_id')): ?>
+                    <?php if (isset(session()->getFlashdata('errors')['kamar_id'])): ?>
                         <p class="mt-2 text-sm text-red-600 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('kamar_id') ?>
+                            <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['kamar_id'] ?>
                         </p>
                     <?php endif; ?>
                 </div>
@@ -74,14 +89,14 @@
                         <i class="fas fa-credit-card text-green-600 mr-2"></i>Jenis Pembayaran
                     </label>
                     <select name="jenis_pembayaran" id="jenis_pembayaran" required
-                            class="w-full px-4 py-3 border <?= $validation->hasError('jenis_pembayaran') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
+                            class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['jenis_pembayaran'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition appearance-none bg-white cursor-pointer">
                         <option value="">-- Pilih Jenis Pembayaran --</option>
                         <option value="Bulanan" <?= old('jenis_pembayaran') == 'Bulanan' ? 'selected' : '' ?>>Bulanan</option>
                         <option value="DP/Awal" <?= old('jenis_pembayaran') == 'DP/Awal' ? 'selected' : '' ?>>DP/Awal</option>
                     </select>
-                    <?php if ($validation->hasError('jenis_pembayaran')): ?>
+                    <?php if (isset(session()->getFlashdata('errors')['jenis_pembayaran'])): ?>
                         <p class="mt-2 text-sm text-red-600 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('jenis_pembayaran') ?>
+                            <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['jenis_pembayaran'] ?>
                         </p>
                     <?php endif; ?>
                 </div>
@@ -96,10 +111,10 @@
                         <input type="number" name="jumlah" id="jumlah" required min="10000" 
                                value="<?= old('jumlah') ?>"
                                placeholder="Contoh: 500000"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('jumlah') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                        <?php if ($validation->hasError('jumlah')): ?>
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['jumlah'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                        <?php if (isset(session()->getFlashdata('errors')['jumlah'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('jumlah') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['jumlah'] ?>
                             </p>
                         <?php endif; ?>
                     </div>
@@ -111,10 +126,10 @@
                         </label>
                         <input type="month" name="tagihan_bulan" id="tagihan_bulan" required
                                value="<?= old('tagihan_bulan') ?>"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('tagihan_bulan') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                        <?php if ($validation->hasError('tagihan_bulan')): ?>
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['tagihan_bulan'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                        <?php if (isset(session()->getFlashdata('errors')['tagihan_bulan'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('tagihan_bulan') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['tagihan_bulan'] ?>
                             </p>
                         <?php endif; ?>
                     </div>

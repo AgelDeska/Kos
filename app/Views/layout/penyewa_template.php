@@ -53,8 +53,9 @@
         .sidebar {
             background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
             border-right: 1px solid #e5e7eb;
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-item {
@@ -275,7 +276,7 @@
     <!-- Main Container -->
     <div class="flex">
         <!-- Sidebar (Mobile & Desktop) -->
-        <aside id="sidebar" class="sidebar w-full md:w-64 md:block">
+        <aside id="sidebar" class="sidebar w-full md:w-64 md:block flex flex-col">
             <nav class="p-4 space-y-2">
                 <div class="sidebar-item">
                     <a href="<?= base_url('penyewa/dashboard') ?>" class="active">
@@ -301,16 +302,17 @@
                         <span>Cari Kamar Baru</span>
                     </a>
                 </div>
+            </nav>
 
-                <hr class="my-4 border-gray-200">
-
+            <!-- Logout at very bottom -->
+            <div class="mt-auto p-4 border-t border-gray-200">
                 <div class="sidebar-item">
-                    <a href="<?= base_url('logout') ?>" onclick="document.getElementById('logout-form').submit(); return false;">
-                        <i class="fas fa-sign-out-alt text-red-500"></i>
-                        <span class="text-red-500">Logout</span>
+                    <a href="<?= base_url('logout') ?>" onclick="document.getElementById('logout-form').submit(); return false;" class="text-red-500 hover:text-red-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
                     </a>
                 </div>
-            </nav>
+            </div>
         </aside>
 
         <!-- Main Content -->

@@ -17,8 +17,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-600 text-sm font-medium mb-1">Total Hutang</p>
-                <p class="text-3xl font-bold text-gray-900">Rp 0</p>
-                <p class="text-gray-500 text-xs mt-2">Belum ada booking aktif</p>
+                <p class="text-3xl font-bold text-gray-900">Rp <?= number_format($summary['total_hutang'] ?? 0, 0, ',', '.') ?></p>
+                <p class="text-gray-500 text-xs mt-2">Berdasarkan booking aktif</p>
             </div>
             <i class="fas fa-wallet text-4xl text-red-300"></i>
         </div>
@@ -29,8 +29,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-600 text-sm font-medium mb-1">Sudah Dibayar</p>
-                <p class="text-3xl font-bold text-gray-900">Rp 0</p>
-                <p class="text-gray-500 text-xs mt-2">Sudah diverifikasi</p>
+                <p class="text-3xl font-bold text-gray-900">Rp <?= number_format($summary['sudah_dibayar'] ?? 0, 0, ',', '.') ?></p>
+                <p class="text-gray-500 text-xs mt-2">Pembayaran terverifikasi</p>
             </div>
             <i class="fas fa-check-circle text-4xl text-green-300"></i>
         </div>
@@ -41,8 +41,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-600 text-sm font-medium mb-1">Sisa Hutang</p>
-                <p class="text-3xl font-bold text-gray-900">Rp 0</p>
-                <p class="text-gray-500 text-xs mt-2">Belum ada transaksi</p>
+                <p class="text-3xl font-bold text-gray-900">Rp <?= number_format($summary['sisa_hutang'] ?? 0, 0, ',', '.') ?></p>
+                <p class="text-gray-500 text-xs mt-2">Belum dibayar</p>
             </div>
             <i class="fas fa-calculator text-4xl text-yellow-300"></i>
         </div>
@@ -54,11 +54,11 @@
     <div class="flex flex-col md:flex-row gap-4 items-center">
         <input type="text" placeholder="Cari berdasarkan ID pembayaran atau booking..." 
                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select id="filterPembayaran" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Semua Status</option>
-            <option value="pending">Pending</option>
-            <option value="verified">Terverifikasi</option>
-            <option value="rejected">Ditolak</option>
+            <option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
+            <option value="Lunas">Lunas</option>
+            <option value="Ditolak">Ditolak</option>
         </select>
     </div>
 </div>
@@ -80,6 +80,7 @@
                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Tipe Bayar</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Jumlah</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Tgl Upload</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Bukti</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Aksi</th>
                 </tr>
@@ -87,7 +88,7 @@
             <tbody class="divide-y divide-gray-200">
                 <?php if (empty($pembayaran)): ?>
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
+                        <td colspan="8" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <i class="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
                                 <p class="text-gray-500 font-medium text-lg">Belum ada pembayaran</p>
@@ -114,6 +115,16 @@
                                 <?= isset($p['tanggal_bayar']) ? date('d/m/Y', strtotime($p['tanggal_bayar'])) : '-' ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <?php if (!empty($p['bukti_transfer'])): ?>
+                                    <a href="<?= base_url('uploads/bukti_pembayaran/' . esc($p['bukti_transfer'])) ?>" 
+                                       target="_blank" class="text-blue-600 hover:text-blue-700 text-sm">
+                                        <i class="fas fa-image mr-1"></i>Lihat Bukti
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-gray-400 text-sm">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <?php 
                                     $status = $p['status'] ?? 'Menunggu Verifikasi';
                                     $statusClasses = [
@@ -135,6 +146,13 @@
                                 <a href="<?= base_url('penyewa/pembayaran/' . ($p['pembayaran_id'] ?? $p['id']) . '/detail') ?>" class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center">
                                     <i class="fas fa-eye mr-1"></i>Detail
                                 </a>
+                                <?php if (($p['status'] ?? '') === 'Lunas'): ?>
+                                    <br>
+                                    <a href="<?= base_url('penyewa/download-serah-terima/' . ($p['pembayaran_id'] ?? $p['id'])) ?>" 
+                                       class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center mt-1">
+                                        <i class="fas fa-download mr-1"></i>Download Surat
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

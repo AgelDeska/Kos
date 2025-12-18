@@ -86,16 +86,29 @@ class Booking extends BaseController
             // 1. Update status booking menjadi Diterima
             $this->bookingModel->update($booking_id, ['status' => 'Diterima']);
 
-            // 2. Kamar tetap 'Di Booking' sampai ada pembayaran DP/Awal
+            // 2. Otomatis tolak semua booking lain untuk kamar yang sama yang masih 'Menunggu'
+            $this->bookingModel->where('kamar_id', $kamarId)
+                               ->where('status', 'Menunggu')
+                               ->where('booking_id !=', $booking_id)
+                               ->set(['status' => 'Ditolak'])
+                               ->update();
 
-            return redirect()->back()->with('success', 'Booking berhasil Diterima. Menunggu pembayaran awal.');
+            // 3. Ubah status kamar menjadi 'Di Booking'
+            $this->kamarModel->update($kamarId, ['status' => 'Di Booking']);
+
+            return redirect()->back()->with('success', 'Booking berhasil Diterima. Booking lainnya untuk kamar ini otomatis ditolak.');
 
         } elseif ($action === 'tolak') {
             // 1. Update status booking menjadi Ditolak
             $this->bookingModel->update($booking_id, ['status' => 'Ditolak']);
 
-            // 2. Kembalikan status kamar menjadi 'Tersedia'
-            $this->kamarModel->update($kamarId, ['status' => 'Tersedia']);
+            // 2. Kembalikan status kamar menjadi 'Tersedia' jika tidak ada booking aktif
+            $activeBookings = $this->bookingModel->where('kamar_id', $kamarId)
+                                                 ->whereIn('status', ['Diterima', 'Aktif'])
+                                                 ->countAllResults();
+            if ($activeBookings == 0) {
+                $this->kamarModel->update($kamarId, ['status' => 'Tersedia']);
+            }
 
             return redirect()->back()->with('success', 'Booking berhasil Ditolak.');
         }

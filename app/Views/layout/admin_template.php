@@ -110,31 +110,31 @@
                 </li>
                 <li class="sidebar-item">
                     <a href="<?= base_url('admin/kamar') ?>" class="<?= ($seg2==='kamar') ? 'active' : '' ?>">
-                        <i class="fas fa-door-open w-5 text-purple-400"></i>
+                        <i class="fas fa-door-open w-5 text-blue-500"></i>
                         <span class="ml-3 font-medium">Kelola Kamar</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="<?= base_url('admin/penyewa') ?>" class="<?= ($seg2==='penyewa') ? 'active' : '' ?>">
-                        <i class="fas fa-users w-5 text-green-400"></i>
+                        <i class="fas fa-users w-5 text-blue-600"></i>
                         <span class="ml-3 font-medium">Kelola Penyewa</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="<?= base_url('admin/booking') ?>" class="<?= ($seg2==='booking') ? 'active' : '' ?>">
-                        <i class="fas fa-calendar-check w-5 text-orange-400"></i>
+                        <i class="fas fa-calendar-check w-5 text-blue-700"></i>
                         <span class="ml-3 font-medium">Verifikasi Booking</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="<?= base_url('admin/pembayaran') ?>" class="<?= ($seg2==='pembayaran') ? 'active' : '' ?>">
-                        <i class="fas fa-credit-card w-5 text-pink-400"></i>
+                        <i class="fas fa-credit-card w-5 text-blue-800"></i>
                         <span class="ml-3 font-medium">Kelola Pembayaran</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="<?= base_url('admin/peta') ?>" class="<?= ($seg2==='peta') ? 'active' : '' ?>">
-                        <i class="fas fa-map-marked-alt w-5 text-emerald-400"></i>
+                        <i class="fas fa-map-marked-alt w-5 text-slate-400"></i>
                         <span class="ml-3 font-medium">Kelola Peta Lokasi</span>
                     </a>
                 </li>

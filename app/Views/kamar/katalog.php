@@ -191,10 +191,48 @@
         height: 100%;
         object-fit: cover;
         transition: transform 0.6s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
     }
 
-    .kamar-card:hover .kamar-image {
+    .kamar-image.active {
+        opacity: 1;
+        position: relative;
+    }
+
+    .kamar-card:hover .kamar-image.active {
         transform: scale(1.15) rotate(2deg);
+    }
+
+    /* Photo Carousel Dots */
+    .photo-dots {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dot.active {
+        background: rgba(255, 255, 255, 0.9);
+        transform: scale(1.2);
+    }
+
+    .dot:hover {
+        background: rgba(255, 255, 255, 0.8);
     }
 
     /* Status Badge */
@@ -227,27 +265,6 @@
     .badge-penuh {
         background: rgba(220, 53, 69, 0.95);
         color: white;
-    }
-
-    /* Rating Badge */
-    .rating-badge {
-        position: absolute;
-        bottom: 15px;
-        left: 15px;
-        background: white;
-        padding: 8px 12px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #343a40;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .rating-badge i {
-        color: #ffc107;
     }
 
     /* Card Content */
@@ -314,6 +331,57 @@
         color: #28a745;
         font-size: 14px;
         width: 16px;
+    }
+
+    /* Description */
+    .kamar-description {
+        margin: 15px 0;
+    }
+
+    .description-text {
+        font-size: 13px;
+        color: #6c757d;
+        line-height: 1.4;
+        margin: 0;
+    }
+
+    /* Info Badge */
+    .kamar-info-extra {
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .info-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .info-badge i {
+        font-size: 9px;
+    }
+
+    .info-badge:nth-child(1) {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .info-badge:nth-child(2) {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .info-badge:nth-child(3) {
+        background: #fff3e0;
+        color: #f57c00;
     }
 
     /* Price Section */
@@ -559,10 +627,20 @@
                     </label>
                     <select name="tipe" id="tipe">
                         <option value="">Semua Tipe</option>
-                        <option value="Single">Single</option>
-                        <option value="Double">Double</option>
-                        <option value="Suite">Suite</option>
-                        <option value="Standard">Standard</option>
+                        <?php if (isset($tipe_options) && !empty($tipe_options)): ?>
+                            <?php foreach ($tipe_options as $option): ?>
+                                <?php if (!empty($option['tipe_kamar'])): ?>
+                                    <option value="<?= esc($option['tipe_kamar']) ?>" <?= (isset($filter_tipe) && $filter_tipe == $option['tipe_kamar']) ? 'selected' : '' ?>>
+                                        <?= esc($option['tipe_kamar']) ?>
+                                    </option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="Single">Single</option>
+                            <option value="Double">Double</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Standard">Standard</option>
+                        <?php endif; ?>
                     </select>
                 </div>
 
@@ -573,9 +651,9 @@
                     </label>
                     <select name="status" id="status">
                         <option value="">Semua Status</option>
-                        <option value="Tersedia">Tersedia</option>
-                        <option value="Di Booking">Di Booking</option>
-                        <option value="Penuh">Penuh</option>
+                        <option value="Tersedia" <?= (isset($filter_status) && $filter_status == 'Tersedia') ? 'selected' : '' ?>>Tersedia</option>
+                        <option value="Di Booking" <?= (isset($filter_status) && $filter_status == 'Di Booking') ? 'selected' : '' ?>>Di Booking</option>
+                        <option value="Terisi" <?= (isset($filter_status) && $filter_status == 'Terisi') ? 'selected' : '' ?>>Terisi</option>
                     </select>
                 </div>
 
@@ -586,9 +664,9 @@
                     </label>
                     <select name="harga" id="harga">
                         <option value="">Semua Harga</option>
-                        <option value="1000000">Dibawah Rp 1.000.000</option>
-                        <option value="1000000-2000000">Rp 1.000.000 - Rp 2.000.000</option>
-                        <option value="2000000">Diatas Rp 2.000.000</option>
+                        <option value="1000000" <?= (isset($filter_harga) && $filter_harga == '1000000') ? 'selected' : '' ?>>Dibawah Rp 1.000.000</option>
+                        <option value="1000000-2000000" <?= (isset($filter_harga) && $filter_harga == '1000000-2000000') ? 'selected' : '' ?>>Rp 1.000.000 - Rp 2.000.000</option>
+                        <option value="2000000" <?= (isset($filter_harga) && $filter_harga == '2000000') ? 'selected' : '' ?>>Diatas Rp 2.000.000</option>
                     </select>
                 </div>
 
@@ -599,10 +677,18 @@
                     </label>
                     <select name="kapasitas" id="kapasitas">
                         <option value="">Semua Kapasitas</option>
-                        <option value="1">1 Orang</option>
-                        <option value="2">2 Orang</option>
-                        <option value="3">3 Orang</option>
-                        <option value="4">4 Orang</option>
+                        <?php if (isset($kapasitas_options) && !empty($kapasitas_options)): ?>
+                            <?php foreach ($kapasitas_options as $option): ?>
+                                <option value="<?= esc($option['kapasitas']) ?>" <?= (isset($filter_kapasitas) && $filter_kapasitas == $option['kapasitas']) ? 'selected' : '' ?>>
+                                    <?= esc($option['kapasitas']) ?> Orang
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="1">1 Orang</option>
+                            <option value="2">2 Orang</option>
+                            <option value="3">3 Orang</option>
+                            <option value="4">4 Orang</option>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
@@ -636,12 +722,42 @@
             <div class="kamar-card">
                 <!-- Image Container -->
                 <div class="kamar-image-wrapper">
-                    <img 
-                        src="<?= base_url('img/kamar/' . ($kamar['foto_kamar'] ?? 'placeholder.jpg')) ?>" 
-                        alt="Kamar <?= esc($kamar['nomor_kamar']) ?>"
-                        class="kamar-image"
-                        onerror="this.src='https://via.placeholder.com/400x300?text=Kamar+<?= esc($kamar['nomor_kamar']) ?>'"
-                    />
+                    <?php
+                    $photos = [];
+                    if (!empty($kamar['foto_kamar'])) {
+                        $decoded = json_decode($kamar['foto_kamar'], true);
+                        if (is_array($decoded)) {
+                            $photos = $decoded;
+                        } elseif (!empty($kamar['foto_kamar'])) {
+                            // Legacy single photo
+                            $photos = [$kamar['foto_kamar']];
+                        }
+                    }
+
+                    if (empty($photos)) {
+                        $photos = ['placeholder.jpg'];
+                    }
+                    ?>
+
+                    <div class="kamar-image-carousel" id="carousel-<?= $kamar['kamar_id'] ?>">
+                        <?php foreach ($photos as $index => $photo): ?>
+                            <img
+                                src="<?= base_url('img/kamar/' . $photo) ?>"
+                                alt="Kamar <?= esc($kamar['nomor_kamar']) ?> - Foto <?= $index + 1 ?>"
+                                class="kamar-image <?= $index === 0 ? 'active' : '' ?>"
+                                onerror="this.src='https://via.placeholder.com/400x300?text=Kamar+<?= esc($kamar['nomor_kamar']) ?>'"
+                            />
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- Photo Navigation Dots -->
+                    <?php if (count($photos) > 1): ?>
+                        <div class="photo-dots">
+                            <?php for ($i = 0; $i < count($photos); $i++): ?>
+                                <span class="dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>" data-carousel="<?= $kamar['kamar_id'] ?>"></span>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Status Badge -->
                     <?php 
@@ -661,12 +777,6 @@
                         <i class="fas <?= $statusIcon ?>"></i>
                         <?= $statusText ?>
                     </div>
-
-                    <!-- Rating Badge -->
-                    <div class="rating-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.8</span>
-                    </div>
                 </div>
 
                 <!-- Content -->
@@ -685,23 +795,75 @@
 
                     <!-- Features Grid -->
                     <div class="kamar-features">
-                        <div class="feature-item">
-                            <i class="fas fa-wifi"></i>
-                            <span>WiFi Gratis</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-fan"></i>
-                            <span>AC & Kipas</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-water"></i>
-                            <span>Kamar Mandi</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-bed"></i>
-                            <span>Kasur Premium</span>
-                        </div>
+                        <?php if (!empty($kamar['fasilitas_fitur'])): ?>
+                            <?php 
+                            $fasilitas = explode("\n", trim($kamar['fasilitas_fitur']));
+                            $fasilitas = array_filter($fasilitas);
+                            $fasilitas = array_slice($fasilitas, 0, 4); // Tampilkan maksimal 4 fasilitas
+                            $icons = ['fas fa-wifi', 'fas fa-fan', 'fas fa-water', 'fas fa-bed'];
+                            
+                            foreach ($fasilitas as $index => $item): 
+                                $item = trim($item);
+                                if (empty($item)) continue;
+                                $icon = $icons[$index % count($icons)];
+                            ?>
+                                <div class="feature-item">
+                                    <i class="<?= $icon ?>"></i>
+                                    <span><?= esc($item) ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="feature-item">
+                                <i class="fas fa-wifi"></i>
+                                <span>WiFi Gratis</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-fan"></i>
+                                <span>AC & Kipas</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-water"></i>
+                                <span>Kamar Mandi</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-bed"></i>
+                                <span>Kasur Premium</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
+
+                    <!-- Description -->
+                    <?php if (!empty($kamar['deskripsi'])): ?>
+                        <div class="kamar-description">
+                            <p class="description-text">
+                                <?= esc(substr($kamar['deskripsi'], 0, 100)) ?><?= strlen($kamar['deskripsi']) > 100 ? '...' : '' ?>
+                            </p>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Additional Info -->
+                    <?php if (!empty($kamar['informasi_kamar']) || !empty($kamar['aturan_kamar']) || !empty($kamar['informasi_penting'])): ?>
+                        <div class="kamar-info-extra">
+                            <?php if (!empty($kamar['informasi_kamar'])): ?>
+                                <div class="info-badge">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Info Tambahan</span>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (!empty($kamar['aturan_kamar'])): ?>
+                                <div class="info-badge">
+                                    <i class="fas fa-book"></i>
+                                    <span>Aturan</span>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (!empty($kamar['informasi_penting'])): ?>
+                                <div class="info-badge">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Info Penting</span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Price -->
                     <div class="price-section">
@@ -750,5 +912,64 @@
         <?php endforeach; ?>
     </div>
 </div>
+
+<script>
+// Photo carousel functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize carousels
+    const carousels = document.querySelectorAll('.kamar-image-carousel');
+
+    carousels.forEach(carousel => {
+        const carouselId = carousel.id;
+        const images = carousel.querySelectorAll('.kamar-image');
+        const dots = document.querySelectorAll(`.dot[data-carousel="${carouselId.replace('carousel-', '')}"]`);
+
+        let currentSlide = 0;
+        let slideInterval;
+
+        // Function to show slide
+        function showSlide(index) {
+            images.forEach(img => img.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            images[index].classList.add('active');
+            if (dots[index]) {
+                dots[index].classList.add('active');
+            }
+            currentSlide = index;
+        }
+
+        // Auto slide
+        function startAutoSlide() {
+            if (images.length > 1) {
+                slideInterval = setInterval(() => {
+                    currentSlide = (currentSlide + 1) % images.length;
+                    showSlide(currentSlide);
+                }, 3000); // Change slide every 3 seconds
+            }
+        }
+
+        function stopAutoSlide() {
+            clearInterval(slideInterval);
+        }
+
+        // Dot click handlers
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                stopAutoSlide();
+                startAutoSlide(); // Restart auto slide
+            });
+        });
+
+        // Pause on hover
+        carousel.parentElement.addEventListener('mouseenter', stopAutoSlide);
+        carousel.parentElement.addEventListener('mouseleave', startAutoSlide);
+
+        // Start auto slide
+        startAutoSlide();
+    });
+});
+</script>
 
 <?= $this->endSection() ?>

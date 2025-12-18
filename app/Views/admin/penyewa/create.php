@@ -9,7 +9,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-                <i class="fas fa-user-plus text-green-600 mr-3"></i>Tambah Penyewa Baru
+                <i class="fas fa-user-plus text-blue-600 mr-3"></i>Tambah Penyewa Baru
             </h2>
             <p class="text-gray-600 mt-1">Tambahkan pengguna penyewa baru ke sistem</p>
         </div>
@@ -18,6 +18,35 @@
         </a>
     </div>
 </div>
+
+<!-- Success Message -->
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-green-900"><?= session()->getFlashdata('success') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Error Messages -->
+<?php if (session()->getFlashdata('errors')): ?>
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-red-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-red-900 mb-2">Terjadi kesalahan validasi:</p>
+                <ul class="list-disc list-inside text-red-800 space-y-1">
+                    <?php foreach(session()->getFlashdata('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <!-- Form Container -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -34,10 +63,10 @@
                     <input type="text" name="nama" id="nama" required
                            value="<?= old('nama') ?>"
                            placeholder="Contoh: Budi Santoso"
-                           class="w-full px-4 py-3 border <?= $validation->hasError('nama') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                    <?php if ($validation->hasError('nama')): ?>
+                           class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['nama'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                    <?php if (isset(session()->getFlashdata('errors')['nama'])): ?>
                         <p class="mt-2 text-sm text-red-600 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('nama') ?>
+                            <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['nama'] ?>
                         </p>
                     <?php endif; ?>
                 </div>
@@ -50,10 +79,10 @@
                     <input type="email" name="email" id="email" required
                            value="<?= old('email') ?>"
                            placeholder="Contoh: budi@example.com"
-                           class="w-full px-4 py-3 border <?= $validation->hasError('email') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                    <?php if ($validation->hasError('email')): ?>
+                           class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['email'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                    <?php if (isset(session()->getFlashdata('errors')['email'])): ?>
                         <p class="mt-2 text-sm text-red-600 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('email') ?>
+                            <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['email'] ?>
                         </p>
                     <?php endif; ?>
                 </div>
@@ -68,11 +97,11 @@
                         <input type="text" name="username" id="username" required
                                value="<?= old('username') ?>"
                                placeholder="Contoh: budi_123"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('username') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition"
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['username'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition"
                                pattern="^[a-zA-Z0-9_-]+$">
-                        <?php if ($validation->hasError('username')): ?>
+                        <?php if (isset(session()->getFlashdata('errors')['username'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('username') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['username'] ?>
                             </p>
                         <?php endif; ?>
                         <p class="text-xs text-gray-500 mt-1">Hanya huruf, angka, underscore, dan dash</p>
@@ -86,10 +115,10 @@
                         <input type="tel" name="no_telp" id="no_telp" required
                                value="<?= old('no_telp') ?>"
                                placeholder="Contoh: 081234567890"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('no_telp') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                        <?php if ($validation->hasError('no_telp')): ?>
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['no_telp'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                        <?php if (isset(session()->getFlashdata('errors')['no_telp'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('no_telp') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['no_telp'] ?>
                             </p>
                         <?php endif; ?>
                     </div>
@@ -104,10 +133,10 @@
                         </label>
                         <input type="password" name="password" id="password" required
                                placeholder="Minimal 6 karakter"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('password') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                        <?php if ($validation->hasError('password')): ?>
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['password'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                        <?php if (isset(session()->getFlashdata('errors')['password'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('password') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['password'] ?>
                             </p>
                         <?php endif; ?>
                     </div>
@@ -119,10 +148,10 @@
                         </label>
                         <input type="password" name="confirm_password" id="confirm_password" required
                                placeholder="Ulangi password"
-                               class="w-full px-4 py-3 border <?= $validation->hasError('confirm_password') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
-                        <?php if ($validation->hasError('confirm_password')): ?>
+                               class="w-full px-4 py-3 border <?= (isset(session()->getFlashdata('errors')['confirm_password'])) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500' ?> rounded-lg focus:ring-2 focus:border-transparent transition">
+                        <?php if (isset(session()->getFlashdata('errors')['confirm_password'])): ?>
                             <p class="mt-2 text-sm text-red-600 flex items-center">
-                                <i class="fas fa-exclamation-circle mr-1"></i><?= $validation->getError('confirm_password') ?>
+                                <i class="fas fa-exclamation-circle mr-1"></i><?= session()->getFlashdata('errors')['confirm_password'] ?>
                             </p>
                         <?php endif; ?>
                     </div>
@@ -164,8 +193,8 @@
                     <i class="fas fa-check-circle text-white text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-green-900 mb-2">Requirements</h4>
-                    <ul class="text-sm text-green-800 space-y-1">
+                    <h4 class="font-bold text-blue-900 mb-2">Requirements</h4>
+                    <ul class="text-sm text-blue-800 space-y-1">
                         <li><i class="fas fa-check text-green-600 mr-1"></i>Username: 5+ karakter</li>
                         <li><i class="fas fa-check text-green-600 mr-1"></i>Email: Valid & Unik</li>
                         <li><i class="fas fa-check text-green-600 mr-1"></i>Password: 6+ karakter</li>
@@ -181,7 +210,7 @@
                     <i class="fas fa-key text-white text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-orange-900 mb-2">Keamanan Password</h4>
+                    <h4 class="font-bold text-blue-900 mb-2">Keamanan Password</h4>
                     <p class="text-sm text-orange-800">Password akan di-hash secara aman. Pastikan penyewa mencatat password mereka untuk login pertama kali.</p>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-<?= $this->extend('penyewa_template') ?>
+<?= $this->extend('layout/penyewa_template') ?>
 
 <?= $this->section('content') ?>
 
@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Detail Pembayaran</h1>
-                <p class="text-gray-600 text-sm mt-1">Pembayaran ID: #<?= esc($pembayaran['pembayaran_id']) ?></p>
+                <p class="text-gray-600 text-sm mt-1">Nomor Pembayaran: #<?= esc($pembayaran['pembayaran_id']) ?></p>
             </div>
             <a href="<?= base_url('/penyewa/pembayaran') ?>" class="btn btn-secondary flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>Kembali
@@ -89,7 +89,7 @@
                     </div>
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <p class="text-gray-600 text-sm font-medium">Tipe Kamar</p>
-                        <p class="text-gray-900 font-bold text-lg mt-1"><?= esc($booking['tipe']) ?></p>
+                        <p class="text-gray-900 font-bold text-lg mt-1"><?= esc($booking['tipe_kamar']) ?></p>
                     </div>
                     <div class="bg-green-50 p-4 rounded-lg border border-green-200">
                         <p class="text-gray-600 text-sm font-medium">Harga per Bulan</p>

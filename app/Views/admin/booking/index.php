@@ -7,7 +7,7 @@
 <!-- Header -->
 <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-        <i class="fas fa-calendar-check text-purple-600 mr-3"></i>Verifikasi Booking
+        <i class="fas fa-calendar-check text-blue-600 mr-3"></i>Verifikasi Booking
     </h2>
     <p class="text-gray-600 mt-1">Kelola permintaan booking dari penyewa</p>
 </div>
@@ -28,7 +28,7 @@
             <!-- Status Filter -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-filter text-purple-600 mr-2"></i>Status Booking
+                    <i class="fas fa-filter text-blue-600 mr-2"></i>Status Booking
                 </label>
                 <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                     <option value="">Semua Status</option>
@@ -42,7 +42,7 @@
             <!-- Sort By -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-arrow-up-down text-green-600 mr-2"></i>Urutkan Berdasarkan
+                    <i class="fas fa-arrow-up-down text-blue-600 mr-2"></i>Urutkan Berdasarkan
                 </label>
                 <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                     <option value="tanggal_booking" <?= $sortBy === 'tanggal_booking' ? 'selected' : '' ?>>Tanggal Booking</option>
@@ -55,7 +55,7 @@
             <!-- Sort Order -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-sort text-orange-600 mr-2"></i>Urutan
+                    <i class="fas fa-sort text-blue-600 mr-2"></i>Urutan
                 </label>
                 <div class="flex gap-2">
                     <button type="submit" name="sortOrder" value="ASC" class="flex-1 px-4 py-2 <?= $sortOrder === 'ASC' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' ?> rounded-lg hover:bg-blue-600 hover:text-white transition font-semibold">
@@ -96,7 +96,7 @@
     <!-- Header -->
     <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-gray-200 flex items-center justify-between">
         <div class="flex items-center">
-            <i class="fas fa-list text-purple-600 text-xl mr-3"></i>
+            <i class="fas fa-list text-blue-600 text-xl mr-3"></i>
             <h3 class="text-lg font-bold text-gray-900">Daftar Permintaan Booking</h3>
             <span class="ml-3 px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-sm font-semibold">
                 <?= count($bookings ?? []) ?> Booking
@@ -143,7 +143,7 @@
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm font-semibold text-gray-900"><?= esc($b['username']) ?></p>
-                                    <p class="text-xs text-gray-500">ID: <?= esc($b['user_id']) ?></p>
+                                    <p class="text-xs text-gray-500">Nomor: <?= esc($b['user_id']) ?></p>
                                 </div>
                             </div>
                         </td>

@@ -33,9 +33,9 @@
             <!-- Status Filter -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-filter text-purple-600 mr-2"></i>Status Akun
+                    <i class="fas fa-filter text-blue-600 mr-2"></i>Status Akun
                 </label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="">Semua Status</option>
                     <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Aktif</option>
                     <option value="0" <?= $status === '0' ? 'selected' : '' ?>>Nonaktif</option>
@@ -45,9 +45,9 @@
             <!-- Sort By -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-arrow-up-down text-green-600 mr-2"></i>Urutkan Berdasarkan
+                    <i class="fas fa-arrow-up-down text-blue-600 mr-2"></i>Urutkan Berdasarkan
                 </label>
-                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="nama" <?= $sortBy === 'nama' ? 'selected' : '' ?>>Nama</option>
                     <option value="email" <?= $sortBy === 'email' ? 'selected' : '' ?>>Email</option>
                     <option value="username" <?= $sortBy === 'username' ? 'selected' : '' ?>>Username</option>
@@ -59,7 +59,7 @@
             <!-- Sort Order -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-sort text-orange-600 mr-2"></i>Urutan
+                    <i class="fas fa-sort text-blue-600 mr-2"></i>Urutan
                 </label>
                 <div class="flex gap-2">
                     <button type="submit" name="sortOrder" value="ASC" class="flex-1 px-4 py-2 <?= $sortOrder === 'ASC' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' ?> rounded-lg hover:bg-blue-600 hover:text-white transition font-semibold">

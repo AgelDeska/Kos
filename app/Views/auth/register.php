@@ -291,6 +291,23 @@
         </div>
       </div>
 
+      <!-- Nomor Telepon -->
+      <div class="form-group">
+        <label for="no_telp"><i class="fas fa-phone me-2"></i>Nomor Telepon</label>
+        <input
+          type="tel"
+          id="no_telp"
+          name="no_telp"
+          class="form-control <?= isset(session()->get('errors')['no_telp']) ? 'is-invalid' : '' ?>"
+          placeholder="081234567890"
+          value="<?= old('no_telp') ?>"
+          required
+        />
+        <?php if (isset(session()->get('errors')['no_telp'])): ?>
+          <div class="invalid-feedback"><?= session()->get('errors')['no_telp'] ?></div>
+        <?php endif; ?>
+      </div>
+
       <!-- Password & Confirm Password (2 columns on desktop) -->
       <div class="form-row">
         <div class="form-group">

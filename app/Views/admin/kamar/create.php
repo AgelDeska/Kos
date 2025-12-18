@@ -23,6 +23,7 @@
 
             <div class="p-6">
                 <?= form_open_multipart('admin/kamar/store', ['class' => 'space-y-6']) ?>
+                <?= csrf_field() ?>
 
                     <!-- Row 1: Nomor & Tipe -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,20 +96,205 @@
                         <?php endif; ?>
                     </div>
 
-                    <!-- Photo -->
+                    <!-- Fasilitas & Fitur -->
                     <div>
-                        <label for="foto_kamar" class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-image text-pink-600 mr-2"></i>Foto Kamar
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-concierge-bell text-amber-600 mr-2"></i>Fasilitas & Fitur
                         </label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition cursor-pointer" onclick="document.getElementById('foto_kamar').click()">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
-                            <p class="text-gray-600 font-medium">Klik untuk upload atau drag & drop</p>
-                            <p class="text-gray-500 text-sm">PNG, JPG, atau GIF (Max. 2MB)</p>
-                            <input type="file" id="foto_kamar" name="foto_kamar" class="hidden" accept="image/*">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <?php
+                            $fasilitas_options = [
+                                'WiFi Gratis' => 'fas fa-wifi',
+                                'AC & Kipas' => 'fas fa-fan',
+                                'Kamar Mandi Dalam' => 'fas fa-shower',
+                                'Kasur Premium' => 'fas fa-bed',
+                                'Lemari Pakaian' => 'fas fa-archive',
+                                'Meja Kerja' => 'fas fa-desktop',
+                                'TV' => 'fas fa-tv',
+                                'Kulkas' => 'fas fa-refrigerator',
+                                'Dapur Kecil' => 'fas fa-utensils',
+                                'Parkir Motor' => 'fas fa-motorcycle',
+                                'Parkir Mobil' => 'fas fa-car',
+                                'Laundry' => 'fas fa-tshirt',
+                                'Keamanan 24 Jam' => 'fas fa-shield-alt',
+                                'CCTV' => 'fas fa-video',
+                                'Lift' => 'fas fa-elevator',
+                                'Gym' => 'fas fa-dumbbell',
+                                'Kolam Renang' => 'fas fa-swimming-pool',
+                                'Restoran' => 'fas fa-utensils',
+                                'Masjid' => 'fas fa-mosque',
+                                'Supermarket' => 'fas fa-shopping-cart'
+                            ];
+                            $selected_fasilitas = old('fasilitas_fitur', []);
+                            if (!is_array($selected_fasilitas)) {
+                                $selected_fasilitas = [];
+                            }
+                            ?>
+                            <?php foreach ($fasilitas_options as $fasilitas => $icon): ?>
+                                <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                    <input type="checkbox" name="fasilitas_fitur[]" value="<?= esc($fasilitas) ?>" 
+                                           class="w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 focus:ring-2"
+                                           <?= in_array($fasilitas, $selected_fasilitas) ? 'checked' : '' ?>>
+                                    <i class="<?= $icon ?> text-gray-600"></i>
+                                    <span class="text-sm text-gray-700 font-medium"><?= esc($fasilitas) ?></span>
+                                </label>
+                            <?php endforeach; ?>
                         </div>
-                        <?php if ($validation->hasError('foto_kamar')): ?>
-                            <p class="text-red-600 text-sm mt-2 flex items-center"><i class="fas fa-alert-circle mr-1"></i><?= $validation->getError('foto_kamar') ?></p>
+                        <div class="mt-3">
+                            <label for="fasilitas_lainnya" class="block text-sm font-medium text-gray-700 mb-1">Fasilitas Lainnya (Opsional)</label>
+                            <input type="text" id="fasilitas_lainnya" name="fasilitas_lainnya" value="<?= old('fasilitas_lainnya') ?>" 
+                                   placeholder="Tambahkan fasilitas lain jika tidak ada di daftar..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition">
+                        </div>
+                        <?php if ($validation->hasError('fasilitas_fitur')): ?>
+                            <p class="text-red-600 text-sm mt-2 flex items-center"><i class="fas fa-alert-circle mr-1"></i><?= $validation->getError('fasilitas_fitur') ?></p>
                         <?php endif; ?>
+                    </div>
+
+                    <!-- Informasi Kamar -->
+                    <div>
+                        <label for="informasi_kamar" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>Informasi Kamar
+                        </label>
+                        <textarea id="informasi_kamar" name="informasi_kamar" rows="4" placeholder="Informasi tambahan tentang kamar, seperti luas, arah, dll..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition <?= $validation->hasError('informasi_kamar') ? 'border-red-500 ring-red-500 ring-2' : '' ?>"><?= old('informasi_kamar') ?></textarea>
+                        <?php if ($validation->hasError('informasi_kamar')): ?>
+                            <p class="text-red-600 text-sm mt-1 flex items-center"><i class="fas fa-alert-circle mr-1"></i><?= $validation->getError('informasi_kamar') ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Aturan Kamar -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-book text-green-600 mr-2"></i>Aturan Kamar
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <?php
+                            $aturan_options = [
+                                'Jam malam pukul 22:00 WIB' => 'fas fa-moon',
+                                'Dilarang merokok di dalam kamar' => 'fas fa-smoking-ban',
+                                'Dilarang membawa tamu sembarangan' => 'fas fa-user-friends',
+                                'Dilarang membuat kegaduhan' => 'fas fa-volume-off',
+                                'Harus menjaga kebersihan kamar' => 'fas fa-broom',
+                                'Dilarang memasak di kamar' => 'fas fa-utensils',
+                                'Pembayaran tepat waktu' => 'fas fa-calendar-check',
+                                'Dilarang membawa hewan peliharaan' => 'fas fa-paw',
+                                'Harus melapor jika ada kerusakan' => 'fas fa-tools',
+                                'Dilarang menggunakan listrik berlebihan' => 'fas fa-plug'
+                            ];
+                            $selected_aturan = old('aturan_kamar', []);
+                            if (!is_array($selected_aturan)) {
+                                $selected_aturan = [];
+                            }
+                            ?>
+                            <?php foreach ($aturan_options as $aturan => $icon): ?>
+                                <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                    <input type="checkbox" name="aturan_kamar[]" value="<?= esc($aturan) ?>" 
+                                           class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                                           <?= in_array($aturan, $selected_aturan) ? 'checked' : '' ?>>
+                                    <i class="<?= $icon ?> text-gray-600"></i>
+                                    <span class="text-sm text-gray-700 font-medium"><?= esc($aturan) ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="mt-3">
+                            <label for="aturan_lainnya" class="block text-sm font-medium text-gray-700 mb-1">Aturan Lainnya (Opsional)</label>
+                            <input type="text" id="aturan_lainnya" name="aturan_lainnya" value="<?= old('aturan_lainnya') ?>" 
+                                   placeholder="Tambahkan aturan lain jika tidak ada di daftar..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                        </div>
+                        <?php if ($validation->hasError('aturan_kamar')): ?>
+                            <p class="text-red-600 text-sm mt-2 flex items-center"><i class="fas fa-alert-circle mr-1"></i><?= $validation->getError('aturan_kamar') ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Informasi Penting -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>Informasi Penting
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <?php
+                            $info_options = [
+                                'Deposit sebesar 1 bulan sewa' => 'fas fa-money-bill-wave',
+                                'Pembayaran dilakukan di awal bulan' => 'fas fa-calendar-alt',
+                                'Denda keterlambatan pembayaran Rp 50.000/hari' => 'fas fa-exclamation-circle',
+                                'Listrik sudah termasuk dalam harga sewa' => 'fas fa-lightbulb',
+                                'Air sudah termasuk dalam harga sewa' => 'fas fa-tint',
+                                'Biaya kebersihan Rp 25.000/bulan' => 'fas fa-broom',
+                                'Biaya maintenance ditanggung penghuni jika rusak' => 'fas fa-tools',
+                                'Kontrak minimal 6 bulan' => 'fas fa-file-contract',
+                                'Tidak ada pengembalian uang jika keluar sebelum kontrak' => 'fas fa-handshake',
+                                'Perpanjangan kontrak 1 bulan sebelum berakhir' => 'fas fa-clock'
+                            ];
+                            $selected_info = old('informasi_penting', []);
+                            if (!is_array($selected_info)) {
+                                $selected_info = [];
+                            }
+                            ?>
+                            <?php foreach ($info_options as $info => $icon): ?>
+                                <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                    <input type="checkbox" name="informasi_penting[]" value="<?= esc($info) ?>" 
+                                           class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+                                           <?= in_array($info, $selected_info) ? 'checked' : '' ?>>
+                                    <i class="<?= $icon ?> text-gray-600"></i>
+                                    <span class="text-sm text-gray-700 font-medium"><?= esc($info) ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="mt-3">
+                            <label for="info_lainnya" class="block text-sm font-medium text-gray-700 mb-1">Informasi Lainnya (Opsional)</label>
+                            <input type="text" id="info_lainnya" name="info_lainnya" value="<?= old('info_lainnya') ?>" 
+                                   placeholder="Tambahkan informasi penting lain jika tidak ada di daftar..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                        </div>
+                        <?php if ($validation->hasError('informasi_penting')): ?>
+                            <p class="text-red-600 text-sm mt-2 flex items-center"><i class="fas fa-alert-circle mr-1"></i><?= $validation->getError('informasi_penting') ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Photo Upload -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-images text-pink-600 mr-2"></i>Foto Kamar (Maksimal 3 Foto)
+                        </label>
+                        <p class="text-sm text-gray-600 mb-4">Upload foto kamar untuk ditampilkan di katalog. Foto pertama akan menjadi foto utama.</p>
+
+                        <!-- Upload New Photos -->
+                        <div class="space-y-3">
+                            <?php for ($i = 1; $i <= 3; $i++): ?>
+                                <div>
+                                    <label for="foto_kamar_<?= $i ?>" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Foto <?= $i ?> <?= $i === 1 ? '(Utama)' : '(Opsional)' ?>
+                                    </label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition cursor-pointer" onclick="document.getElementById('foto_kamar_<?= $i ?>').click()">
+                                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                        <p class="text-gray-600 text-sm font-medium">Klik untuk pilih foto</p>
+                                        <p class="text-gray-500 text-xs">PNG, JPG, WebP (Max. 2MB)</p>
+                                        <input type="file" id="foto_kamar_<?= $i ?>" name="foto_kamar_<?= $i ?>" class="hidden" accept="image/*">
+                                    </div>
+                                    <div id="preview_create_<?= $i ?>" class="mt-2 hidden">
+                                        <img id="img_preview_create_<?= $i ?>" class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                                        <button type="button" onclick="clearPhotoCreate(<?= $i ?>)" class="mt-1 text-xs text-red-600 hover:text-red-800">Hapus</button>
+                                    </div>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+
+                        <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-600 mt-1 mr-2"></i>
+                                <div class="text-sm text-blue-800">
+                                    <p class="font-medium">Informasi:</p>
+                                    <ul class="mt-1 space-y-1">
+                                        <li>• Upload minimal 1 foto untuk hasil terbaik</li>
+                                        <li>• Foto pertama akan menjadi foto utama</li>
+                                        <li>• Semua foto akan ditampilkan di katalog kamar</li>
+                                        <li>• Format yang didukung: PNG, JPG, WebP</li>
+                                        <li>• Ukuran maksimal per foto: 2MB</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Buttons -->
@@ -153,5 +339,65 @@
         </div>
     </div>
 </div>
+
+<script>
+// Photo preview functionality for create form
+<?php for ($i = 1; $i <= 3; $i++): ?>
+document.getElementById('foto_kamar_<?= $i ?>').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('preview_create_<?= $i ?>');
+    const imgPreview = document.getElementById('img_preview_create_<?= $i ?>');
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imgPreview.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.classList.add('hidden');
+    }
+});
+<?php endfor; ?>
+
+function clearPhotoCreate(index) {
+    document.getElementById('foto_kamar_' + index).value = '';
+    document.getElementById('preview_create_' + index).classList.add('hidden');
+}
+
+// Form validation
+document.getElementById('createKamarForm').addEventListener('submit', function(e) {
+    const files = [];
+    for (let i = 1; i <= 3; i++) {
+        const fileInput = document.getElementById('foto_kamar_' + i);
+        if (fileInput.files[0]) {
+            files.push(fileInput.files[0]);
+        }
+    }
+
+    // Check if at least one photo is uploaded
+    if (files.length === 0) {
+        alert('Harap upload minimal 1 foto kamar.');
+        e.preventDefault();
+        return;
+    }
+
+    // Validate file types and sizes
+    for (let file of files) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Format file tidak didukung. Gunakan PNG, JPG, atau WebP.');
+            e.preventDefault();
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) { // 2MB
+            alert('Ukuran file terlalu besar. Maksimal 2MB.');
+            e.preventDefault();
+            return;
+        }
+    }
+});
+</script>
 
 <?= $this->endSection() ?>

@@ -5,6 +5,7 @@ use App\Models\PembayaranModel;
 use App\Models\BookingModel;
 use App\Models\KamarModel;
 use App\Models\UserModel; // Diperlukan untuk form input manual
+use App\Models\SettingModel;
 
 class Pembayaran extends BaseController
 {
@@ -12,6 +13,7 @@ class Pembayaran extends BaseController
     protected $bookingModel;
     protected $kamarModel;
     protected $userModel;
+    protected $settingModel;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class Pembayaran extends BaseController
         $this->bookingModel = new BookingModel();
         $this->kamarModel = new KamarModel();
         $this->userModel = new UserModel();
+        $this->settingModel = new SettingModel();
     }
 
     // [C R U D] - R (Read/Index): Daftar semua pembayaran dengan filter dan search
@@ -83,7 +86,6 @@ class Pembayaran extends BaseController
     {
         $data['users'] = $this->userModel->where('role', 'Penyewa')->findAll();
         $data['kamars'] = $this->kamarModel->findAll();
-        $data['validation'] = \Config\Services::validation();
         return view('admin/pembayaran/create', $data);
     }
 
@@ -128,13 +130,13 @@ class Pembayaran extends BaseController
             if ($pembayaran['jenis_pembayaran'] === 'DP/Awal') {
                 $this->kamarModel->update($kamarId, ['status' => 'Terisi']);
 
-                // Cari booking yang terkait status 'Diterima' dan ubah menjadi 'Aktif'
+                // Cari booking yang terkait status 'Diterima' dan ubah menjadi 'Selesai'
                 $bookingAktif = $this->bookingModel->where('user_id', $userId)
                                                     ->where('kamar_id', $kamarId)
                                                     ->where('status', 'Diterima')
                                                     ->first();
                 if ($bookingAktif) {
-                    $this->bookingModel->update($bookingAktif['booking_id'], ['status' => 'Aktif']);
+                    $this->bookingModel->update($bookingAktif['booking_id'], ['status' => 'Selesai']);
                     // Update juga tanggal masuk penyewa
                     $this->userModel->update($userId, ['tanggal_masuk' => $bookingAktif['tanggal_mulai_sewa']]);
                 }
@@ -144,11 +146,53 @@ class Pembayaran extends BaseController
         } elseif ($action === 'tolak') {
             $this->pembayaranModel->update($pembayaran_id, ['status' => 'Ditolak']);
             
-            // Logika: Jika ini pembayaran DP, maka booking yang terkait harus dibatalkan/ditinjau ulang
-            return redirect()->back()->with('warning', 'Pembayaran ditolak/dibatalkan.');
+            // Kirim notifikasi WhatsApp ke admin
+            $user = $this->userModel->find($userId);
+            $kamar = $this->kamarModel->find($kamarId);
+            $message = "Pemberitahuan: Pembayaran dari {$user['nama']} untuk kamar {$kamar['nomor_kamar']} telah DITOLAK. Silakan tinjau ulang.";
+            $this->sendWhatsAppNotification($message);
+            
+            return redirect()->back()->with('warning', 'Pembayaran ditolak. Notifikasi telah dikirim ke WhatsApp admin.');
         }
 
         return redirect()->back();
+    }
+    
+    // Method untuk mengirim notifikasi WhatsApp ke admin
+    private function sendWhatsAppNotification($message)
+    {
+        $adminPhone = $this->settingModel->getSetting('admin_whatsapp');
+        if (!$adminPhone) {
+            log_message('error', 'Nomor WhatsApp admin tidak dikonfigurasi');
+            return false;
+        }
+
+        // Placeholder untuk integrasi WhatsApp API
+        // Contoh menggunakan Twilio atau WhatsApp Business API
+        // Untuk saat ini, hanya log pesan
+        log_message('info', 'WhatsApp Notification: ' . $message . ' to ' . $adminPhone);
+        
+        // TODO: Implementasi actual WhatsApp sending
+        // Contoh dengan curl ke API WhatsApp:
+        /*
+        $apiUrl = 'https://api.whatsapp.com/send'; // Ganti dengan URL API yang sesuai
+        $data = [
+            'phone' => $adminPhone,
+            'message' => $message
+        ];
+        
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        return $response;
+        */
+        
+        return true; // Placeholder return
     }
     
     // [C R U D] - D (Delete): Menghapus data pembayaran

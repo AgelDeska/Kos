@@ -85,7 +85,8 @@ class AuthController extends BaseController
             return redirect()->to(route_to('admin_dashboard'));
         }
 
-        return redirect()->to(route_to('penyewa_dashboard'));
+        // Redirect penyewa ke katalog kamar
+        return redirect()->to(route_to('katalog_kamar'));
     }
 
     /**
@@ -116,6 +117,7 @@ class AuthController extends BaseController
             'nama'              => 'required|min_length[3]|max_length[255]',
             'username'          => 'required|min_length[3]|max_length[100]|is_unique[user.username]',
             'email'             => 'required|valid_email|is_unique[user.email]',
+            'no_telp'           => 'required|min_length[10]|max_length[20]|regex_match[/^[0-9+\-\s()]+$/]',
             'password'          => 'required|min_length[6]|max_length[255]',
             'confirmpassword'   => 'required|matches[password]',
         ];
@@ -127,6 +129,9 @@ class AuthController extends BaseController
             ],
             'email' => [
                 'is_unique' => 'Email sudah terdaftar.',
+            ],
+            'no_telp' => [
+                'regex_match' => 'Format nomor telepon tidak valid. Gunakan angka, spasi, tanda +, -, (, dan ).',
             ],
             'password' => [
                 'matches' => 'Password tidak sesuai dengan konfirmasi password.',
@@ -145,11 +150,11 @@ class AuthController extends BaseController
             'nama'          => $this->request->getPost('nama'),
             'username'      => $this->request->getPost('username'),
             'email'         => $this->request->getPost('email'),
+            'no_telp'       => $this->request->getPost('no_telp'),
             'password'      => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role'          => 'Penyewa',  // Default role untuk registrasi adalah Penyewa
             'is_active'     => 1,          // Langsung aktif saat registrasi
             'tanggal_masuk' => date('Y-m-d'),
-            'no_telp'       => null,
         ];
 
         // Insert ke database

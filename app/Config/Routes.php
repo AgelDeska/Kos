@@ -27,6 +27,9 @@ $routes->get('users/(:num)', 'UserController::view/$1', ['as' => 'users_view']);
 
 // Profil pengguna (khusus user yang login)
 $routes->get('profile', 'UserController::profile', ['as' => 'profile', 'filter' => 'auth']);
+// Edit profil (GET form) dan update profil (POST)
+$routes->get('profile/edit', 'UserController::edit', ['as' => 'profile_edit', 'filter' => 'auth']);
+$routes->post('profile/update', 'UserController::update', ['as' => 'profile_update', 'filter' => 'auth']);
 
 // Katalog Kamar
 $routes->get('katalog', 'Home::katalogKamar', ['as' => 'katalog_kamar']);
@@ -39,7 +42,7 @@ $routes->get('login', 'AuthController::login', ['as' => 'login']);
 $routes->post('login', 'AuthController::attemptLogin');
 $routes->get('register', 'AuthController::register', ['as' => 'register']);
 $routes->post('register', 'AuthController::attemptRegister');
-$routes->get('logout', 'AuthController::logout', ['as' => 'logout']);
+$routes->match(['get', 'post'], 'logout', 'AuthController::logout', ['as' => 'logout']);
 $routes->post('auth/logout', 'AuthController::logout');
 
 // Forgot Password
@@ -53,6 +56,9 @@ $routes->post('reset-password', 'AuthController::updatePassword');
 // 2. Rute Area Penyewa (Membutuhkan AuthFilter)
 // =========================================================
 
+// Route dashboard standalone untuk penyewa
+$routes->get('dashboard', 'PenyewaController::dashboard', ['filter' => 'auth']);
+
 $routes->group('penyewa', ['filter' => 'auth'], function($routes) {
     // Dashboard Penyewa
     $routes->get('dashboard', 'PenyewaController::dashboard', ['as' => 'penyewa_dashboard']);
@@ -64,6 +70,10 @@ $routes->group('penyewa', ['filter' => 'auth'], function($routes) {
     $routes->post('booking/save', 'PenyewaController::saveBooking', ['as' => 'save_booking']);
     // Riwayat Booking
     $routes->get('riwayat-booking', 'PenyewaController::riwayatBooking', ['as' => 'riwayat_booking']);
+    // Detail Booking
+    $routes->get('booking/(:num)/detail', 'PenyewaController::detailBooking/$1', ['as' => 'detail_booking']);
+    // Batal Booking
+    $routes->post('booking/(:num)/batal', 'PenyewaController::batalBooking/$1', ['as' => 'batal_booking']);
     
     // Pembayaran Penyewa (Upload Bukti Bayar)
     // List pembayaran/tagihan penyewa
@@ -74,6 +84,8 @@ $routes->group('penyewa', ['filter' => 'auth'], function($routes) {
     $routes->post('pembayaran/upload', 'PenyewaController::uploadBukti', ['as' => 'upload_bukti']);
     // Detail pembayaran
     $routes->get('pembayaran/(:num)/detail', 'PenyewaController::detailPembayaran/$1', ['as' => 'detail_pembayaran']);
+    // Download surat serah terima
+    $routes->get('download-serah-terima/(:num)', 'PenyewaController::downloadSerahTerima/$1', ['as' => 'download_serah_terima']);
 });
 
 
@@ -96,6 +108,9 @@ $routes->group('admin', ['filter' => 'admin', 'namespace' => 'App\Controllers\Ad
     // Quick status update from index view
     $routes->post('kamar/status/(:num)', 'Kamar::updateStatus/$1', ['as' => 'admin_kamar_status']);
     $routes->get('kamar/delete/(:num)', 'Kamar::delete/$1', ['as' => 'admin_kamar_delete']);
+    // Repair management
+    $routes->get('kamar/perbaikan', 'Kamar::perbaikan', ['as' => 'admin_kamar_perbaikan']);
+    $routes->post('kamar/selesai-perbaikan/(:num)', 'Kamar::selesaiPerbaikan/$1', ['as' => 'admin_kamar_selesai_perbaikan']);
 
     // --- Manajemen Penyewa (CRUD - UC-4) ---
     $routes->get('penyewa', 'Penyewa::index', ['as' => 'admin_penyewa_index']);
@@ -122,6 +137,10 @@ $routes->group('admin', ['filter' => 'admin', 'namespace' => 'App\Controllers\Ad
     $routes->post('pembayaran/verify/(:num)', 'Pembayaran::verify/$1', ['as' => 'admin_pembayaran_verify']); 
     // Hapus data Pembayaran
     $routes->get('pembayaran/delete/(:num)', 'Pembayaran::delete/$1', ['as' => 'admin_pembayaran_delete']); 
+
+    // --- Kelola Peta Lokasi Kos ---
+    $routes->get('peta', 'Peta::index', ['as' => 'admin_peta_index']);
+    $routes->post('peta/update', 'Peta::update', ['as' => 'admin_peta_update']);
 
     // --- Laporan (Laporan Keuangan & Kamar) ---
     $routes->get('laporan/keuangan', 'Dashboard::laporanKeuangan');

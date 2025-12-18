@@ -304,8 +304,9 @@
                 </div>
             <?php endif; ?>
 
-            <?= form_open('penyewa/booking/save') ?>
-                <?= form_hidden('kamar_id', esc($kamar['kamar_id'])) ?>
+            <form action="<?= base_url('penyewa/booking/save') ?>" method="POST">
+                <?= csrf_field() ?>
+                <input type="hidden" name="kamar_id" value="<?= esc($kamar['kamar_id']) ?>">
 
                 <!-- Durasi Sewa -->
                 <div class="form-group">
@@ -364,7 +365,7 @@
                     <i class="fas fa-check-circle"></i>
                     Konfirmasi Booking
                 </button>
-            <?= form_close() ?>
+            </form>
 
             <a href="<?= base_url('kamar/katalog') ?>" class="btn-back">
                 <i class="fas fa-arrow-left"></i>

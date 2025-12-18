@@ -11,9 +11,11 @@
             </h2>
             <p class="text-gray-600 mt-1">Manage semua kamar kos dan statusnya</p>
         </div>
-        <a href="<?= base_url('admin/kamar/create') ?>" class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-lg transition transform hover:scale-105 shadow-lg">
-            <i class="fas fa-plus mr-2"></i>Tambah Kamar Baru
-        </a>
+        <div class="flex gap-3 mt-4 md:mt-0">
+            <a href="<?= base_url('admin/kamar/create') ?>" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition transform hover:scale-105 shadow-lg">
+                <i class="fas fa-plus mr-2"></i>Tambah Kamar Baru
+            </a>
+        </div>
     </div>
 </div>
 
@@ -33,9 +35,9 @@
             <!-- Status Filter -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-filter text-purple-600 mr-2"></i>Status
+                    <i class="fas fa-filter text-blue-600 mr-2"></i>Status
                 </label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="">Semua Status</option>
                     <option value="Tersedia" <?= $status === 'Tersedia' ? 'selected' : '' ?>>Tersedia</option>
                     <option value="Di Booking" <?= $status === 'Di Booking' ? 'selected' : '' ?>>Di Booking</option>
@@ -46,9 +48,9 @@
             <!-- Sort By -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-arrow-up-down text-green-600 mr-2"></i>Urutkan Berdasarkan
+                    <i class="fas fa-arrow-up-down text-blue-600 mr-2"></i>Urutkan Berdasarkan
                 </label>
-                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                <select name="sortBy" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="nomor_kamar" <?= $sortBy === 'nomor_kamar' ? 'selected' : '' ?>>Nomor Kamar</option>
                     <option value="tipe_kamar" <?= $sortBy === 'tipe_kamar' ? 'selected' : '' ?>>Tipe Kamar</option>
                     <option value="harga" <?= $sortBy === 'harga' ? 'selected' : '' ?>>Harga</option>
@@ -60,7 +62,7 @@
             <!-- Sort Order -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-sort text-orange-600 mr-2"></i>Urutan
+                    <i class="fas fa-sort text-blue-600 mr-2"></i>Urutan
                 </label>
                 <div class="flex gap-2">
                     <button type="submit" name="sortOrder" value="ASC" class="flex-1 px-4 py-2 <?= $sortOrder === 'ASC' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' ?> rounded-lg hover:bg-blue-600 hover:text-white transition font-semibold">
@@ -97,11 +99,23 @@
     </div>
 <?php endif; ?>
 
+<!-- Error Message -->
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-red-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-red-900"><?= session()->getFlashdata('error') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <!-- Table Card -->
 <div class="card">
     <div class="card-header">
         <h3 class="text-lg font-bold text-gray-900 flex items-center">
-            <i class="fas fa-list text-indigo-600 mr-2"></i>Daftar Kamar Kos SmartKos
+            <i class="fas fa-list text-blue-600 mr-2"></i>Daftar Kamar Kos SmartKos
         </h3>
     </div>
     <div class="card-body overflow-x-auto">
@@ -137,13 +151,35 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#<?= esc($kamar['kamar_id']) ?></td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center space-x-3">
-                                <?php $foto = $kamar['foto_kamar'] ?? null; ?>
+                                <?php
+                                $foto = $kamar['foto_kamar'] ?? null;
+                                $displayPhoto = 'placeholder.jpg';
+
+                                if ($foto) {
+                                    $decoded = json_decode($foto, true);
+                                    if (is_array($decoded) && !empty($decoded)) {
+                                        $displayPhoto = $decoded[0]; // Show first photo
+                                    } elseif (!empty($foto)) {
+                                        $displayPhoto = $foto; // Legacy single photo
+                                    }
+                                }
+                                ?>
                                 <div class="w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
-                                    <img src="<?= base_url('img/kamar/' . ($foto ? $foto : 'placeholder.jpg')) ?>" alt="Foto Kamar <?= esc($kamar['nomor_kamar']) ?>" class="w-full h-full object-cover">
+                                    <img src="<?= base_url('img/kamar/' . $displayPhoto) ?>" alt="Foto Kamar <?= esc($kamar['nomor_kamar']) ?>" class="w-full h-full object-cover" onerror="this.src='<?= base_url('img/kamar/placeholder.jpg') ?>'">
                                 </div>
                                 <div>
                                     <div class="font-bold text-gray-900"><?= esc($kamar['nomor_kamar']) ?></div>
-                                    <div class="text-xs text-gray-500">ID: #<?= esc($kamar['kamar_id']) ?></div>
+                                    <div class="text-xs text-gray-500">Nomor: #<?= esc($kamar['kamar_id']) ?></div>
+                                    <?php if ($foto): ?>
+                                        <?php
+                                        $decoded = json_decode($foto, true);
+                                        $photoCount = is_array($decoded) ? count($decoded) : 1;
+                                        ?>
+                                        <div class="text-xs text-blue-600 flex items-center mt-1">
+                                            <i class="fas fa-images mr-1"></i>
+                                            <?= $photoCount ?> foto
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </td>

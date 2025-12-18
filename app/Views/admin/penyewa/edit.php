@@ -9,7 +9,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-                <i class="fas fa-user-edit text-orange-600 mr-3"></i>Edit Penyewa
+                <i class="fas fa-user-edit text-blue-600 mr-3"></i>Edit Penyewa
             </h2>
             <p class="text-gray-600 mt-1">Perbarui informasi penyewa <span class="font-semibold"><?= esc($penyewa['nama']) ?></span></p>
         </div>
@@ -18,6 +18,30 @@
         </a>
     </div>
 </div>
+
+<!-- Success Message -->
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-green-900"><?= session()->getFlashdata('success') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Error Message -->
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-red-600 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-red-900"><?= session()->getFlashdata('error') ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <!-- Form Container -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -91,7 +115,7 @@
                 <!-- Password Section -->
                 <div class="border-t-2 border-gray-200 pt-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-key text-orange-600 mr-2"></i>Ubah Password (Opsional)
+                        <i class="fas fa-key text-blue-600 mr-2"></i>Ubah Password (Opsional)
                     </h3>
                     <p class="text-sm text-gray-600 mb-4">Biarkan kosong jika tidak ingin mengubah password</p>
 
@@ -152,9 +176,9 @@
                     <i class="fas fa-user-circle text-white text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-indigo-900 mb-2">Informasi Penyewa</h4>
-                    <ul class="text-sm text-indigo-800 space-y-1">
-                        <li><strong>ID:</strong> <?= esc($penyewa['user_id']) ?></li>
+                    <h4 class="font-bold text-blue-900 mb-2">Informasi Penyewa</h4>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li><strong>Nomor:</strong> <?= esc($penyewa['user_id']) ?></li>
                         <li><strong>Username:</strong> <?= esc($penyewa['username']) ?></li>
                         <li><strong>Status:</strong> <?= $penyewa['is_active'] == 1 ? '<span class="text-green-600 font-bold">Aktif</span>' : '<span class="text-red-600 font-bold">Nonaktif</span>' ?></li>
                         <li><strong>Tgl Masuk:</strong> <?= esc($penyewa['tanggal_masuk'] ?? '-') ?></li>
@@ -188,7 +212,7 @@
                     <i class="fas fa-info-circle text-white text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-orange-900 mb-2">Catatan Penting</h4>
+                    <h4 class="font-bold text-blue-900 mb-2">Catatan Penting</h4>
                     <p class="text-sm text-orange-800">Username tidak dapat diubah. Jika perlu mengubah username, hubungi administrator sistem.</p>
                 </div>
             </div>

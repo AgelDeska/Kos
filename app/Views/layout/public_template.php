@@ -98,7 +98,7 @@
         display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;
         padding: 160px 20px; min-height: 640px; color: #fff; position: relative; border-radius: var(--radius);
         margin: 16px 5% 0 5%; box-shadow: var(--card-shadow);
-        background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.6)), url('https://images.pexels.com/photos/101808/pexels-photo-101808.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center/cover no-repeat;
+        background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.6)), url('<?= base_url('img/kos/depankos.jpeg') ?>') center/cover no-repeat;
         overflow: hidden;
       }
       .hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(1200px 400px at 50% -10%, rgba(37,99,235,0.25), transparent 60%); }
@@ -200,6 +200,10 @@
           <li><a href="<?= base_url('katalog') ?>" class="btn-cta"><i class="fas fa-home"></i> Lihat Kamar</a></li>
           <?php if (session()->get('isLoggedIn')): ?>
             <li>
+              <a href="<?= base_url('dashboard') ?>" title="Dashboard" style="display:inline-flex; align-items:center; gap:8px; margin-right:8px;">
+                <i class="fas fa-tachometer-alt" style="color:#e5e7eb;"></i>
+                <span style="color:#e5e7eb; font-weight:600;">Dashboard</span>
+              </a>
               <a href="<?= base_url('profile') ?>" title="Profil Saya" style="display:inline-flex; align-items:center; gap:8px;">
                 <span style="width:34px; height:34px; border-radius:999px; background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700;"><?= strtoupper(substr(session()->get('nama') ?? session()->get('username') ?? 'U', 0, 1)) ?></span>
                 <span style="color:#e5e7eb; font-weight:600; margin-left:6px;">Profil</span>
